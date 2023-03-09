@@ -1,3 +1,5 @@
+// Default Port for Postgres is 5432
+// Webserver listens on Port 3000
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -17,4 +19,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-module.exports = app;
+module.exports = app
+console.log("Running");
+
+app.listen(3000);
+
+
