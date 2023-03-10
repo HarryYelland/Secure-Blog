@@ -1,3 +1,5 @@
+//Basic database connector
+
 const {Db} = require('pg')
 
 const db = new Db({
