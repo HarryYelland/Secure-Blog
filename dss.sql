@@ -1,3 +1,5 @@
+/* Basic Updated SQL file. */
+
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Posts;
 
