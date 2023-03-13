@@ -12,4 +12,9 @@ a {
   border-style: solid;
   margin-bottom: 20px;
 }
+#listOfPosts{
+  border: black;
+  border-style: dotted;
+  padding: 10px;
+}
 
