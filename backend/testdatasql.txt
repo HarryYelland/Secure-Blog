@@ -1,0 +1,5 @@
+SELECT * FROM Users;
+SELECT * FROM Posts;
+
+INSERT INTO Users (Username, Password, Email, Session, Two_fa) VALUES ('Test_User', 'Test_Pass', 'Test_Email', 'Test_Session', 1);
+INSERT INTO Posts (Post_Title, Post_Body, Author, Is_Private) VALUES ('Test_Post', 'This is a test post', 1, FALSE);
