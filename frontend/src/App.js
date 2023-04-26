@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AddPost from "./components/AddPost";
+import AddUser from "./components/Register";
 
 export default function App() {
 
@@ -10,6 +11,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AddPost />} />
+          <Route path="/register" element={<AddUser />} />
         </Routes>
       </BrowserRouter>
 

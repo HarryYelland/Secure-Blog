@@ -29,10 +29,23 @@ function dbQuery(query) {
   })
 }
 
+app.post("/add-user", (req, res) => {
+  dbQuery("INSERT INTO users (username, password, email, session, two_fa) VALUES ('" + req.body.username + "', '" + req.body.password + "', '" + req.body.email + "', 'Test_Session', 1)");
+  console.log("User added!");
+  res.send("User added!");
+  return res;
+});
+
 app.post("/add-post", (req, res) => {
   dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 1, FALSE)");
   console.log("Post added!");
   res.send("Post added!");
+  return res;
+});
+
+app.post("/all-posts", (req, res) => {
+  dbQuery("SELECT * FROM posts");
+  console.log("All posts queried!");
   return res;
 });
 
