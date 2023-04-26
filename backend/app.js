@@ -9,17 +9,18 @@ app.use(cors());
 
 const { Pool, Client } = require('pg');
  
-const client = new Client({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'postgres',
-  password: 'computing',
-  port: 5432,
-});
 
-client.connect();
  
 function dbQuery(query) {
+  const client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'postgres',
+    password: 'computing',
+    port: 5432,
+  });
+  
+  client.connect();
   console.log("Querying database: ", query);
   client.query(query, (err, res) => {
     console.log(err, res);
