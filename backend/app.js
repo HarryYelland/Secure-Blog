@@ -43,6 +43,12 @@ app.post("/add-post", (req, res) => {
   return res;
 });
 
+app.post("/all-posts", (req, res) => {
+  dbQuery("SELECT * FROM posts");
+  console.log("All posts queried!");
+  return res;
+});
+
 app.listen(PORT, () => {
   console.log("Running Backend server on port ", PORT);
 });
