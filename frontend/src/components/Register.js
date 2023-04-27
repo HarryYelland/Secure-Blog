@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
 
-// Function to handle submitting item to sales order
 const submit = () => {
   if(document.getElementById("password").value !== document.getElementById("confirmPassword").value) {
     alert("Passwords do not match!");
     return;
   }
   alert("Submitting details...");
-  // POST request to the backend to submit the item to the sales order
   Axios.post("http://localhost:3001/add-user", {
     username: document.getElementById("username").value,
     password: document.getElementById("password").value,
@@ -16,12 +14,9 @@ const submit = () => {
   }).then((response) => {
     console.log(response);
     alert("User Created!");
-    // Reload the page
-    //window.location.href = "/";
   });
 };
 
-// Main function for adding a product to a sales order page
 function AddUser() {  
   return (
     <div>
