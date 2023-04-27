@@ -35,6 +35,8 @@ function AddUser() {
         <input id="confirmPassword" placeholder="Re-type Password" type="password"></input>
         <button type="submit" id="userSubmit" onClick={submit}>Submit</button>
     </form>
+    <h3>Already have an account?</h3>
+    <a href="/">Login Here!</a>
   </div>
   );
 }

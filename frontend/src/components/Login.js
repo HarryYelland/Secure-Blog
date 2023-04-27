@@ -20,6 +20,8 @@ function Login() {
         <br/>
         <button type="submit" id="userSubmit" onClick={submit}>Submit</button>
     </form>
+    <h3>New User?</h3>
+    <a href="/register">Register Here!</a>
   </div>
   );
 }
