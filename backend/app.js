@@ -15,15 +15,15 @@ function sendEmail(email, code){
 // Using resources found at https://www.w3schools.com/nodejs/nodejs_email.asp
 
   var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'Hotmail',
     auth: {
-      user: 'dsssecureblogug13@gmail.com',
+      user: 'dsssecureblogug13@hotmail.com',
       pass: 'Computing1!'
     }
   });
   
   var mailOptions = {
-    from: 'dsssecureblogug13@gmail.com',
+    from: 'dsssecureblogug13@hotmail.com',
     to: email,
     subject: 'Your 2FA code',
     text: 'Your 2FA code is ' + code + '.'
