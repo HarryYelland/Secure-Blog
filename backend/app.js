@@ -6,9 +6,38 @@ var app = express();
 const PORT = 3001;
 app.use(express.json());
 app.use(cors());
+var nodemailer = require('nodemailer');
 
 const { Pool, Client } = require('pg');
  
+
+function sendEmail(email, code){
+// Using resources found at https://www.w3schools.com/nodejs/nodejs_email.asp
+
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'dsssecureblogug13@gmail.com',
+      pass: 'Computing1!'
+    }
+  });
+  
+  var mailOptions = {
+    from: 'dsssecureblogug13@gmail.com',
+    to: email,
+    subject: 'Your 2FA code',
+    text: 'Your 2FA code is ' + code + '.'
+  };
+  
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+}
+
 
  
 function dbQuery(query) {
@@ -22,14 +51,23 @@ function dbQuery(query) {
   
   client.connect();
   console.log("Querying database: ", query);
-  client.query(query, async (err, res) => {
-    //console.log(err, res);
-    await client.end();
-    var result = res.rows;
-    //console.log("Query result: ", res.rows[0]);
-    console.log(result);
-    return result;
+  // await client.query(query, (err, res) => {
+  //   //console.log(err, res);
+  //   var result = res.rows;
+  //   client.end();
+  //   //console.log("Query result: ", res.rows[0]);
+  //   //console.log(result);
+  //   return result;
+  // })
+
+  client
+  .query(query)
+  .then(res => {
+    console.log(res.rows)
+    client.end()
+    return res.rows;
   })
+  .catch(err => console.error(err.stack));
 }
 
 app.post("/add-user", (req, res) => {
@@ -47,28 +85,18 @@ app.post("/add-post", (req, res) => {
 });
 
 app.get("/all-posts", (req, res) => {
-  var result;
+  var query = dbQuery("SELECT * FROM posts")
+  var result = [];
 
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'postgres',
-    password: 'computing',
-    port: 5432,
-  });
   
-  client.connect();
-  console.log("Querying database: ", "select * from posts");
-  client.query("select * from posts", async (err, res) => {
-    //console.log(err, res);
-    await client.end();
-    result = res.rows;
-    //console.log("Query result: ", res.rows[0]);
-    console.log(result);
-    //return result;
-  });
+
+  result.push(query);
   res.send(result);
+
+  return result;
 });
+
+sendEmail("harryyelland@gmail.com", "1234");
 
 app.listen(PORT, () => {
   console.log("Running Backend server on port ", PORT);

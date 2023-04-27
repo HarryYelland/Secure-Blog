@@ -3,7 +3,7 @@ import Axios from "axios";
 
 // Function to handle submitting item to sales order
 const submit = () => {
-
+  
 };
 
 // Main function for adding a product to a sales order page

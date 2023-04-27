@@ -6,9 +6,8 @@ var POSTS = [];
 
 function ViewPosts() { 
   console.log("Viewing posts...");
-  Axios.get("http://localhost:3001/all-posts", {
-  }).then((response) => {
-    console.log(response);
+  Axios.get("http://localhost:3001/all-posts").then((response) => {
+    console.log("response from backend: " + response);
     for (let i = 0; i < response.length; i++) {
       POSTS.push([response.data[i].Post_Title, response.data[i].Post_Body]);
     }
