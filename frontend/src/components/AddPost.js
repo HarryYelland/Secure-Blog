@@ -1,22 +1,17 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
 
-// Function to handle submitting item to sales order
 const submit = () => {
   alert("Submitting post...");
-  // POST request to the backend to submit the item to the sales order
   Axios.post("http://localhost:3001/add-post", {
     postTitle: document.getElementById("postTitle").value,
     postText: document.getElementById("postText").value
   }).then((response) => {
     console.log(response);
     alert("Post submitted!");
-    // Reload the page
-    //window.location.href = "/";
   });
 };
 
-// Main function for adding a product to a sales order page
 function AddPost() {  
   return (
     <div>

@@ -23,9 +23,10 @@ function dbQuery(query) {
   client.connect();
   console.log("Querying database: ", query);
   client.query(query, (err, res) => {
-    console.log(err, res);
+    //console.log(err, res);
     client.end();
-    return res;
+    console.log("Query result: ", res.rows);
+    return res.rows;
   })
 }
 
@@ -43,10 +44,10 @@ app.post("/add-post", (req, res) => {
   return res;
 });
 
-app.post("/all-posts", (req, res) => {
-  dbQuery("SELECT * FROM posts");
-  console.log("All posts queried!");
-  return res;
+app.get("/all-posts", (req, res) => {
+  const result = dbQuery("SELECT * FROM posts");
+  console.log("All posts: ", result);
+  res.send(result);
 });
 
 app.listen(PORT, () => {
