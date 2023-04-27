@@ -9,11 +9,39 @@ app.use(cors());
 var nodemailer = require('nodemailer');
 
 const { Pool, Client } = require('pg');
+
+const illegalPhrases = [
+  "SELECT",
+  "INSERT",
+  "UPDATE",
+  "DELETE",
+  "DROP",
+  "CREATE",
+  "ALTER",
+  "TRUNCATE",
+  "TABLE",
+  "DATABASE",
+  "FROM",
+  "WHERE",
+  "INTO",
+  "VALUES",
+  "ORDER",
+];
+
+function antiSQLi(input) {
+  var inputUpper = input.toUpperCase();
+  var clean = true;
+  for(let i=0, len=illegalPhrases.length; i<len; i++) {
+    if (inputUpper.includes(illegalPhrases[i])) {
+      clean = false;
+    }
+  }
+  return clean;
+}
  
 
 function sendEmail(email, code){
 // Using resources found at https://www.w3schools.com/nodejs/nodejs_email.asp
-
   var transporter = nodemailer.createTransport({
     service: 'Hotmail',
     auth: {
@@ -84,19 +112,27 @@ app.post("/add-post", (req, res) => {
   return res;
 });
 
-app.get("/all-posts", (req, res) => {
-  var query = dbQuery("SELECT * FROM posts")
-  var result = [];
+app.get("/all-posts", async (req, res) => {
+  var query = "SELECT * FROM posts";
+  const client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'postgres',
+    password: 'computing',
+    port: 5432,
+  });
+  client.connect();
 
-  
-
-  result.push(query);
-  res.send(result);
-
-  return result;
+  try {
+    const allPosts = await client.query(query);
+    var result = allPosts.rows;
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
-sendEmail("harryyelland@gmail.com", "1234");
+sendEmail("dsssecureblogug13@hotmail.com", "1234");
 
 app.listen(PORT, () => {
   console.log("Running Backend server on port ", PORT);
