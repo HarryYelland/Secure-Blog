@@ -22,11 +22,13 @@ function dbQuery(query) {
   
   client.connect();
   console.log("Querying database: ", query);
-  client.query(query, (err, res) => {
+  client.query(query, async (err, res) => {
     //console.log(err, res);
-    client.end();
-    console.log("Query result: ", res.rows);
-    return res.rows;
+    await client.end();
+    var result = res.rows;
+    //console.log("Query result: ", res.rows[0]);
+    console.log(result);
+    return result;
   })
 }
 
@@ -45,8 +47,26 @@ app.post("/add-post", (req, res) => {
 });
 
 app.get("/all-posts", (req, res) => {
-  const result = dbQuery("SELECT * FROM posts");
-  console.log("All posts: ", result);
+  var result;
+
+  const client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'postgres',
+    password: 'computing',
+    port: 5432,
+  });
+  
+  client.connect();
+  console.log("Querying database: ", "select * from posts");
+  client.query("select * from posts", async (err, res) => {
+    //console.log(err, res);
+    await client.end();
+    result = res.rows;
+    //console.log("Query result: ", res.rows[0]);
+    console.log(result);
+    //return result;
+  });
   res.send(result);
 });
 

@@ -4,9 +4,6 @@ import Post from "./Post";
 
 var POSTS = [];
 
-
-
-// Main function for adding a product to a sales order page
 function ViewPosts() { 
   console.log("Viewing posts...");
   Axios.get("http://localhost:3001/all-posts", {
