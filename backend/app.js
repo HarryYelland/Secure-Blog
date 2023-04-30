@@ -8,7 +8,16 @@ app.use(express.json());
 app.use(cors());
 var nodemailer = require('nodemailer');
 
-const { Pool, Client } = require('pg');
+const { Client } = require('pg');
+
+const Pool = require('pg').Pool
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'postgres',
+  password: 'computing',
+  port: 5432,
+});
 
 const illegalPhrases = [
   "SELECT",
@@ -112,25 +121,23 @@ app.post("/add-post", (req, res) => {
   return res;
 });
 
-app.get("/all-posts", async (req, res) => {
-  var query = "SELECT * FROM posts";
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'postgres',
-    password: 'computing',
-    port: 5432,
-  });
-  client.connect();
+app.get('/all-posts', function(request, response) {
+  pool.connect(function(err, db, done) {
+    if(err) {
+      return response.status(400).send(err)
+    } else {
+      db.query('SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE is_private = FALSE ORDER BY post_id DESC', function(err, table) {
+        done();
+        if(err){
+          return response.status(400).send(err);
+        } else {
+          return response.status(200).send(table.rows)
+        }
+      })
+    }
+  })
+})
 
-  try {
-    const allPosts = await client.query(query);
-    var result = allPosts.rows;
-    console.log(result);
-  } catch (error) {
-    console.log(error);
-  }
-});
 
 sendEmail("dsssecureblogug13@hotmail.com", "1234");
 
