@@ -22,4 +22,4 @@ function TwoFactorCheck() {
   );
 }
 
-export default Login;
+export default TwoFactorCheck;

@@ -6,6 +6,8 @@ import AddUser from "./components/Register";
 import ViewPosts from "./components/ViewPosts";
 import Login from "./components/Login";
 import TestPosts from "./components/TestPosts";
+import TwoFactorCheck from "./components/TwoFactorCheck";
+import MyPosts from "./components/MyPosts";
 
 export default function App() {
 
@@ -18,6 +20,8 @@ export default function App() {
           <Route path="/register" element={<AddUser />} />
           <Route path="/view" element={<ViewPosts />} />
           <Route path="/view-test" element={<TestPosts />} />
+          <Route path="/2FA" element={<TwoFactorCheck />} />
+          <Route path="/my-posts" element={<MyPosts />} />
         </Routes>
       </BrowserRouter>
 

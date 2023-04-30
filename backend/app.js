@@ -138,6 +138,23 @@ app.get('/all-posts', function(request, response) {
   })
 })
 
+app.get('/my-posts', function(request, response) {
+  pool.connect(function(err, db, done) {
+    if(err) {
+      return response.status(400).send(err)
+    } else {
+      // Change the user_id later when this is implemented
+      db.query('SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE user_id = 1 ORDER BY post_id DESC', function(err, table) {
+        done();
+        if(err){
+          return response.status(400).send(err);
+        } else {
+          return response.status(200).send(table.rows)
+        }
+      })
+    }
+  })
+})
 
 sendEmail("dsssecureblogug13@hotmail.com", "1234");
 
