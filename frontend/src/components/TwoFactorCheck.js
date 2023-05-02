@@ -5,6 +5,10 @@ import Axios from "axios";
 const submit = () => {
   
 };
+const twoFaNum = new Uint16Array(1);
+crypto.getRandomValues(twoFaNum);
+let numtext = twoFaNum[0];
+console.log(numtext);
 
 // Main function for adding a product to a sales order page
 function TwoFactorCheck() {  
