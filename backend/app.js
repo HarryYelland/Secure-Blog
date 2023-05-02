@@ -10,6 +10,8 @@ var nodemailer = require('nodemailer');
 
 const { Client } = require('pg');
 
+const allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
 const Pool = require('pg').Pool
 const pool = new Pool({
   user: 'postgres',
@@ -18,6 +20,59 @@ const pool = new Pool({
   password: 'computing',
   port: 5432,
 });
+
+// Function to add Salt to the user's password
+function salt(rawPassword, saltVal){
+  // Appends salt to user's password
+  var saltedPassword = rawPassword + saltVal;
+  return saltedPassword;
+}
+
+// Function to generate a Salt, ready to be stored in db/added to password
+function generateSalt(){
+  var salt = "";
+  // gets 5 random chars from allChars constant
+  for(let i=0; i<5; i++){
+    salt += allChars.charAt(Math.floor(Math.random * allChars.length))
+  }
+  return salt;
+}
+
+// Function to add pepper to user's password
+function pepper(rawPassword, pepperVal){
+  var pepperedPassword = "";
+  // Peppers before and after just to be slightly different from potential other systems
+  pepperedPassword = pepperVal + rawPassword + pepperVal;
+  return pepperedPassword;
+}
+
+// Function generate a pepper by selecting a random character from the array
+function generatePepper(){
+  var pepper = allChars.charAt(Math.floor(Math.random * allChars.length))
+  return pepper;
+}
+
+// Function to hash the user's password
+async function hash(rawPassword){
+  //https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+  const encoder = new TextEncoder();
+  const data = encoder.encode(rawPassword);
+  const hashedPassword = await crypto.subtle.digest("SHA-256", data);
+  return hashedPassword;
+}
+
+function passwordGenerator(rawPassword){
+  var improvedPassword = "";
+  improvedPassword = salt(rawPassword, generateSalt);
+  improvedPassword = pepper(improvedPassword, generatePepper);
+  improvedPassword = hash(improvedPassword);
+  return improvedPassword;
+}
+
+function passwordChecker(rawPassword, pepper){
+
+}
+
 
 const illegalPhrases = [
   "SELECT",
