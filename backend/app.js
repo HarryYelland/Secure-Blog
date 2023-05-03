@@ -1,5 +1,6 @@
 // https://node-postgres.com/
 
+const crypto = require("crypto");
 var express = require("express");
 const cors = require("cors");
 var app = express();
@@ -38,6 +39,15 @@ function generateSalt(){
   return salt;
 }
 
+//Function to get salt from db
+function getSalt(id){
+  dbQuery("SELECT salt FROM users WHERE user_id = " + id);
+  //console.log(res);
+  //return res;
+}
+
+getSalt(4)
+
 // Function to add pepper to user's password
 function pepper(rawPassword, pepperVal){
   var pepperedPassword = "";
@@ -46,26 +56,31 @@ function pepper(rawPassword, pepperVal){
   return pepperedPassword;
 }
 
-// Function generate a pepper by selecting a random character from the array
+// Function to generate a pepper by selecting a random character from the array
 function generatePepper(){
-  var pepper = allChars.charAt(Math.floor(Math.random * allChars.length))
+  var pepper = allChars.charAt(Math.floor(Math.random() * allChars.length))
+  console.log('pepper ' + pepper);
   return pepper;
 }
 
 // Function to hash the user's password
-async function hash(rawPassword){
-  //https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
-  const encoder = new TextEncoder();
-  const data = encoder.encode(rawPassword);
-  const hashedPassword = await crypto.subtle.digest("SHA-256", data);
+function hash(rawPassword){
+  //https://www.geeksforgeeks.org/how-to-create-hash-from-string-in-javascript/
+  //console.log(crypto.getHashes());
+  hashedPassword = crypto.createHash('sha256').update(rawPassword).digest('hex');
+  console.log(hashedPassword);
   return hashedPassword;
 }
 
+//passwordGenerator("Test");
+
 function passwordGenerator(rawPassword){
   var improvedPassword = "";
-  improvedPassword = salt(rawPassword, generateSalt);
-  improvedPassword = pepper(improvedPassword, generatePepper);
+  improvedPassword = salt(rawPassword, generateSalt());
+  improvedPassword = pepper(improvedPassword, generatePepper());
+  //console.log("salt&pepper " + improvedPassword);
   improvedPassword = hash(improvedPassword);
+  //console.log("HASHED PASSWORD: " + improvedPassword);
   return improvedPassword;
 }
 
