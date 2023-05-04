@@ -73,6 +73,14 @@ function passwordChecker(rawPassword, pepper){
 
 }
 
+//Generates random values for the 2fa
+const get2fa = () => {
+  const twoFaNum = new Uint16Array(1);
+  crypto.getRandomValues(twoFaNum);
+  let numtext = twoFaNum[0];
+  console.log(numtext);
+  return numtext;
+};
 
 const illegalPhrases = [
   "SELECT",
@@ -130,7 +138,7 @@ function sendEmail(email, code){
   });
 }
 
-
+sendEmail('kingaj4ever@gmail.com', get2fa);
  
 function dbQuery(query) {
   const client = new Client({
