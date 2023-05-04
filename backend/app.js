@@ -77,28 +77,30 @@ function passwordGenerator(rawPassword){
 }
 
 function passwordChecker(username, rawPassword){
-  const salt = dbQuery("SELECT salt FROM users WHERE username LIKE " + username);
-  console.log("Salt = " + salt)
+  const salted = dbQuery("SELECT salt FROM users WHERE username LIKE " + username);
+  console.log("Salt = " + salted)
   var checkPassword = "";
-  checkPassword = salt(rawPassword, salt);
+  checkPassword = salt(rawPassword, salted);
 
   var id = -1;
 
   for(let i=0; i<allChars.length; i++){
     checkPassword = pepper(checkPassword, allChars.charAt(i));
-    console.log("salt&pepper " + improvedPassword);
+    //console.log("salt&pepper " + checkPassword);
     checkPassword = hash(checkPassword);
-    console.log("HASHED PASSWORD: " + improvedPassword);
+    //console.log("HASHED PASSWORD: " + checkPassword);
 
-    if(improvedPassword == dbQuery("SELECT password FROM users WHERE username LIKE " + username)){
-      console.log("Found match")
+    if(checkPassword == dbQuery("SELECT password FROM users WHERE username LIKE " + username)){
+      console.log("\n Found match")
       id = dbQuery("SELECT user_id FROM users WHERE username LIKE " + username) 
+    } else {
+      //console.log("\n No match on " + checkPassword);
     }
   }
   return id;
 }
 
-
+passwordChecker('Test_User', "Test")
 
 const illegalPhrases = [
   "SELECT",
