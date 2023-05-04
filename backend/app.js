@@ -89,10 +89,11 @@ function passwordChecker(username, rawPassword){
     //console.log("salt&pepper " + checkPassword);
     checkPassword = hash(checkPassword);
     //console.log("HASHED PASSWORD: " + checkPassword);
-
-    if(checkPassword == dbQuery("SELECT password FROM users WHERE username LIKE " + username)){
-      console.log("\n Found match")
-      id = dbQuery("SELECT user_id FROM users WHERE username LIKE " + username) 
+    var query = "SELECT password FROM users WHERE username LIKE '" + username +"'";
+    if(checkPassword == dbQuery(query)){
+      console.log("\n Found match");
+      query = "SELECT user_id FROM users WHERE username LIKE '" + username + "'";
+      id = dbQuery(query);
     } else {
       //console.log("\n No match on " + checkPassword);
     }
@@ -170,7 +171,7 @@ function dbQuery(query) {
   });
   
   client.connect();
-  console.log("Querying database: ", query);
+  //console.log("Querying database: ", query);
   // await client.query(query, (err, res) => {
   //   //console.log(err, res);
   //   var result = res.rows;
@@ -239,7 +240,7 @@ app.get('/my-posts', function(request, response) {
   })
 })
 
-sendEmail("dsssecureblogug13@hotmail.com", "1234");
+//sendEmail("dsssecureblogug13@hotmail.com", "1234");
 
 app.listen(PORT, () => {
   console.log("Running Backend server on port ", PORT);
