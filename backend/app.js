@@ -39,14 +39,6 @@ function generateSalt(){
   return salt;
 }
 
-//Function to get salt from db
-function getSalt(id){
-  dbQuery("SELECT salt FROM users WHERE user_id = " + id);
-  //console.log(res);
-  //return res;
-}
-
-getSalt(4)
 
 // Function to add pepper to user's password
 function pepper(rawPassword, pepperVal){
@@ -80,13 +72,32 @@ function passwordGenerator(rawPassword){
   improvedPassword = pepper(improvedPassword, generatePepper());
   //console.log("salt&pepper " + improvedPassword);
   improvedPassword = hash(improvedPassword);
-  //console.log("HASHED PASSWORD: " + improvedPassword);
+  console.log("HASHED PASSWORD: " + improvedPassword);
   return improvedPassword;
 }
 
-function passwordChecker(rawPassword, pepper){
+function passwordChecker(username, rawPassword){
+  const salt = dbQuery("SELECT salt FROM users WHERE username LIKE " + username);
+  console.log("Salt = " + salt)
+  var checkPassword = "";
+  checkPassword = salt(rawPassword, salt);
 
+  var id = -1;
+
+  for(let i=0; i<allChars.length; i++){
+    checkPassword = pepper(checkPassword, allChars.charAt(i));
+    console.log("salt&pepper " + improvedPassword);
+    checkPassword = hash(checkPassword);
+    console.log("HASHED PASSWORD: " + improvedPassword);
+
+    if(improvedPassword == dbQuery("SELECT password FROM users WHERE username LIKE " + username)){
+      console.log("Found match")
+      id = dbQuery("SELECT user_id FROM users WHERE username LIKE " + username) 
+    }
+  }
+  return id;
 }
+
 
 
 const illegalPhrases = [
