@@ -4,26 +4,27 @@ import React, {useState, useEffect} from 'react';
 
 function TestPosts() {
   const [posts, setPosts] = useState(false);
-  var allPosts = [];
+  var allPosts = {};
   useEffect(() => {
     getPosts();
   }, []);
-  function getPosts() {
+  async function getPosts() {
     fetch('http://localhost:3001/all-posts')
       .then(response => {
         response.json()
         .then(function(data) {
           //console.log(data);
           for (let i = 0; i < data.length; i++) {
-            allPosts.push([data[i].post_id, data[i].username, data[i].post_title, data[i].post_body]);
+            allPosts[i] = {"postid": data[i].post_id, "username": data[i].username, "title": data[i].post_title, "body": data[i].post_body};
           }
         })
       })
-    console.log(allPosts);
+    await console.log(allPosts);
   }
   return (
     <div>
-      {allPosts.toString() ? allPosts.toString() : 'There is no post data available'}
+      <h1>The Football Blog</h1>
+      {JSON.stringify(allPosts)}
     </div>
   );
 }
