@@ -13,6 +13,8 @@ export default function App() {
 
   return (
     <div className="view">
+      <h1>The Football Blog</h1>
+      <br/>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />

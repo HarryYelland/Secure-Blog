@@ -47,8 +47,8 @@ function ViewPosts() {
   }, [posts]);
   return (
     <div>
-      <h1>The Football Blog</h1>
-      <h2>The Latest Posts</h2>
+      <a href="/post">Make a post</a>
+      <h2>View The Latest Posts</h2>
       <br/>
       <div>
         <h3>{post1[0]}</h3>
@@ -69,7 +69,7 @@ function ViewPosts() {
         <h4>By {post3[1]}</h4>
         <p>{post3[2]}</p>
       </div>
-      
+      <a href="/post">Make a post</a>
     </div>
   )
  
