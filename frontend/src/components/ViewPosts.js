@@ -53,7 +53,6 @@ function ViewPosts() {
       <div>
         <h3>{post1[0]}</h3>
         <h4>By {post1[1]}</h4>
-        <br/>
         <p>{post1[2]}</p>
       </div>
       <br/>
@@ -61,7 +60,6 @@ function ViewPosts() {
       <div>
         <h3>{post2[0]}</h3>
         <h4>By {post2[1]}</h4>
-        <br/>
         <p>{post2[2]}</p>
       </div>
       <br/>
@@ -69,7 +67,6 @@ function ViewPosts() {
       <div>
         <h3>{post3[0]}</h3>
         <h4>By {post3[1]}</h4>
-        <br/>
         <p>{post3[2]}</p>
       </div>
       

@@ -5,7 +5,7 @@ import { ReCAPTCHA } from "react-google-recaptcha";
 var bot = true;
 
 const submit = () => {
-  if(bot == false){
+  //if(bot == false){
     alert("Submitting post...");
     Axios.post("http://localhost:3001/add-post", {
       postTitle: document.getElementById("postTitle").value,
@@ -14,9 +14,9 @@ const submit = () => {
       console.log(response);
       alert("Post submitted!");
     });
-  } else {
-    alert("Please complete recaptcha");
-  }
+  //} else {
+  //  alert("Please complete recaptcha");
+  //}
 };
 
 function verify(){

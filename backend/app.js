@@ -199,7 +199,7 @@ app.post("/add-user", (req, res) => {
 });
 
 app.post("/add-post", (req, res) => {
-  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 1, FALSE)");
+  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 4, FALSE)");
   console.log("Post added!");
   res.send("Post added!");
   return res;
