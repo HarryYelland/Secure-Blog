@@ -73,7 +73,6 @@ function ViewPosts() {
         <p>{post3[2]}</p>
       </div>
       
-      
     </div>
   )
  
