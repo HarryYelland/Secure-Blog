@@ -135,6 +135,7 @@ function gen2fa(){
   crypto.getRandomValues(twoFaNum);
   let numtext = twoFaNum[0];
   console.log(numtext);
+
   return numtext;
 }
 
