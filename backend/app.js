@@ -130,6 +130,14 @@ function sendEmail(email, code){
   });
 }
 
+function gen2fa(){
+  const twoFaNum = new Uint16Array(1);
+  crypto.getRandomValues(twoFaNum);
+  let numtext = twoFaNum[0];
+  console.log(numtext);
+  return numtext;
+}
+
 
  
 function dbQuery(query) {
@@ -207,6 +215,16 @@ app.get('/my-posts', function(request, response) {
           return response.status(200).send(table.rows)
         }
       })
+    }
+  })
+})
+
+app.get('/login-user', function(request, response){
+  pool.connect(function(err, db, done){
+    if(err) {
+      return response.status(400).send(err)
+    }else{
+      db.query("SELECT username, password FROM posts WHERE username IN('" + request.body.username +"'");
     }
   })
 })
