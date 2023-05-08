@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
-import { ReCAPTCHA } from "react-google-recaptcha";
+//import { ReCAPTCHA } from "react-google-recaptcha";
 
 var bot = true;
 
@@ -34,10 +34,10 @@ function AddPost() {
         <label for="postText" placeholder="Type anything here! (within reason lol)">Post something here!</label><br/>
         <textarea id="postText" placeholder="Type anything here! (within reason lol)" cols="40" rows="10"></textarea>
         <br/>
-        <ReCAPTCHA 
+        {/*<ReCAPTCHA
           sitekey="6LelxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
           onChange={verify()}
-        />
+        />*/}
         <br/>
         <button type="submit" id="postSubmit" onClick={submit}>Submit</button>
     </form>

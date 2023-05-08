@@ -1,6 +1,5 @@
 // https://node-postgres.com/
 
-const crypto = require("crypto");
 var express = require("express");
 const cors = require("cors");
 var app = express();
@@ -39,7 +38,6 @@ function generateSalt(){
   return salt;
 }
 
-
 // Function to add pepper to user's password
 function pepper(rawPassword, pepperVal){
   var pepperedPassword = "";
@@ -48,60 +46,33 @@ function pepper(rawPassword, pepperVal){
   return pepperedPassword;
 }
 
-// Function to generate a pepper by selecting a random character from the array
+// Function generate a pepper by selecting a random character from the array
 function generatePepper(){
-  var pepper = allChars.charAt(Math.floor(Math.random() * allChars.length))
-  console.log('pepper ' + pepper);
+  var pepper = allChars.charAt(Math.floor(Math.random * allChars.length))
   return pepper;
 }
 
 // Function to hash the user's password
-function hash(rawPassword){
-  //https://www.geeksforgeeks.org/how-to-create-hash-from-string-in-javascript/
-  //console.log(crypto.getHashes());
-  hashedPassword = crypto.createHash('sha256').update(rawPassword).digest('hex');
-  console.log(hashedPassword);
+async function hash(rawPassword){
+  //https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+  const encoder = new TextEncoder();
+  const data = encoder.encode(rawPassword);
+  const hashedPassword = await crypto.subtle.digest("SHA-256", data);
   return hashedPassword;
 }
 
-//passwordGenerator("Test");
-
 function passwordGenerator(rawPassword){
   var improvedPassword = "";
-  improvedPassword = salt(rawPassword, generateSalt());
-  improvedPassword = pepper(improvedPassword, generatePepper());
-  //console.log("salt&pepper " + improvedPassword);
+  improvedPassword = salt(rawPassword, generateSalt);
+  improvedPassword = pepper(improvedPassword, generatePepper);
   improvedPassword = hash(improvedPassword);
-  console.log("HASHED PASSWORD: " + improvedPassword);
   return improvedPassword;
 }
 
-function passwordChecker(username, rawPassword){
-  const salted = dbQuery("SELECT salt FROM users WHERE username LIKE " + username);
-  console.log("Salt = " + salted)
-  var checkPassword = "";
-  checkPassword = salt(rawPassword, salted);
+function passwordChecker(rawPassword, pepper){
 
-  var id = -1;
-
-  for(let i=0; i<allChars.length; i++){
-    checkPassword = pepper(checkPassword, allChars.charAt(i));
-    //console.log("salt&pepper " + checkPassword);
-    checkPassword = hash(checkPassword);
-    //console.log("HASHED PASSWORD: " + checkPassword);
-    var query = "SELECT password FROM users WHERE username LIKE '" + username +"'";
-    if(checkPassword == dbQuery(query)){
-      console.log("\n Found match");
-      query = "SELECT user_id FROM users WHERE username LIKE '" + username + "'";
-      id = dbQuery(query);
-    } else {
-      //console.log("\n No match on " + checkPassword);
-    }
-  }
-  return id;
 }
 
-passwordChecker('Test_User', "Test")
 
 const illegalPhrases = [
   "SELECT",
@@ -159,6 +130,15 @@ function sendEmail(email, code){
   });
 }
 
+function gen2fa(){
+  const twoFaNum = new Uint16Array(1);
+  crypto.getRandomValues(twoFaNum);
+  let numtext = twoFaNum[0];
+  console.log(numtext);
+
+  return numtext;
+}
+
 
  
 function dbQuery(query) {
@@ -171,7 +151,7 @@ function dbQuery(query) {
   });
   
   client.connect();
-  //console.log("Querying database: ", query);
+  console.log("Querying database: ", query);
   // await client.query(query, (err, res) => {
   //   //console.log(err, res);
   //   var result = res.rows;
@@ -257,7 +237,17 @@ app.get('/my-posts', function(request, response) {
   })
 })
 
-//sendEmail("dsssecureblogug13@hotmail.com", "1234");
+app.get('/login-user', function(request, response){
+  pool.connect(function(err, db, done){
+    if(err) {
+      return response.status(400).send(err)
+    }else{
+      db.query("SELECT username, password FROM posts WHERE username IN('" + request.body.username +"'");
+    }
+  })
+})
+
+sendEmail("dsssecureblogug13@hotmail.com", "1234");
 
 app.listen(PORT, () => {
   console.log("Running Backend server on port ", PORT);
