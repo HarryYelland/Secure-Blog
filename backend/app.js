@@ -222,6 +222,23 @@ app.get('/all-posts', function(request, response) {
   })
 })
 
+app.get('/post', function(request, response) {
+  pool.connect(function(err, db, done) {
+    if(err) {
+      return response.status(400).send(err)
+    } else {
+      db.query("SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE post_id = '" + request.body.postid + "'", function(err, table) {
+        done();
+        if(err){
+          return response.status(400).send(err);
+        } else {
+          return response.status(200).send(table.rows)
+        }
+      })
+    }
+  })
+})
+
 app.get('/my-posts', function(request, response) {
   pool.connect(function(err, db, done) {
     if(err) {
