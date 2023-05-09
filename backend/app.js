@@ -62,7 +62,7 @@ function generatePepper(){
 }
 
 // Function to hash the user's password
-function hash(rawPassword){
+function addHash(rawPassword){
   //https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
   // const encoder = new TextEncoder();
   // const data = encoder.encode(rawPassword);
@@ -74,7 +74,7 @@ function hash(rawPassword){
 
   //https://www.geeksforgeeks.org/how-to-create-hash-from-string-in-javascript/
   // only hexadecimal digits
-  hash = crypto.getHashes();
+  var hash = crypto.getHashes();
   //console.log(hash);
   hashPwd = crypto.createHash('sha256').update(rawPassword).digest('hex');
   return hashPwd;
@@ -84,7 +84,7 @@ function passwordGenerator(rawPassword, salt){
   var improvedPassword = "";
   improvedPassword = addSalt(rawPassword, salt);
   improvedPassword = addPepper(improvedPassword, generatePepper);
-  improvedPassword = hash(improvedPassword);
+  improvedPassword = addHash(improvedPassword);
   return improvedPassword;
 }
 
@@ -195,17 +195,36 @@ function dbQuery(query) {
 }
 
 app.post("/add-user", (req, res) => {
+
+  // generates salt for user
+  var salt = generateSalt();
+
+  // checks if sql injected
   if(antiSQLi(req.body.username) == false ||
     antiSQLi(req.body.password) == false ||
     antiSQLi(req.body.email) == false
   ){
-    return null
+    console.log("SQL Injection detected");
+    return response.status(400).send(err);
   }
-  var salt = generateSalt();
+
+  //checks to see if username already taken
+  dbQuery("SELECT username FROM users WHERE username = '" + req.body.username + "'" , function(err, table) {
+    done();
+    console.log("table length " + table.length);
+    if(table !== []){
+      console.log("Username already taken");
+      return response.status(400).send(err);
+    }
+  });
+
+
+  // inserts new user into db
   dbQuery("INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('"
   + req.body.username + "', '" + passwordGenerator(req.body.password, salt) + "', '" + req.body.email + "', '" + generateSessionId() + "', '" + gen2fa() + "', '" + salt + "')");
-  console.log("User added!");
-  res.send("User added!");
+  
+  //console.log("User added!");
+  //res.send("User added!");
   return res;
 });
 
