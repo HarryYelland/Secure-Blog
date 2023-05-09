@@ -7,10 +7,14 @@ const PORT = 3001;
 app.use(express.json());
 app.use(cors());
 var nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const webcrypto = require('crypto').webcrypto;
 
 const { Client } = require('pg');
 
 const allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+var sessions = [];
 
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -22,7 +26,7 @@ const pool = new Pool({
 });
 
 // Function to add Salt to the user's password
-function salt(rawPassword, saltVal){
+function addSalt(rawPassword, saltVal){
   // Appends salt to user's password
   var saltedPassword = rawPassword + saltVal;
   return saltedPassword;
@@ -33,13 +37,18 @@ function generateSalt(){
   var salt = "";
   // gets 5 random chars from allChars constant
   for(let i=0; i<5; i++){
-    salt += allChars.charAt(Math.floor(Math.random * allChars.length))
+    var pos = Math.floor(Math.random() * allChars.length);
+    console.log(pos);
+    salt += allChars.charAt(pos);
+    console.log(salt);
   }
   return salt;
 }
 
+//generateSalt();
+
 // Function to add pepper to user's password
-function pepper(rawPassword, pepperVal){
+function addPepper(rawPassword, pepperVal){
   var pepperedPassword = "";
   // Peppers before and after just to be slightly different from potential other systems
   pepperedPassword = pepperVal + rawPassword + pepperVal;
@@ -53,18 +62,28 @@ function generatePepper(){
 }
 
 // Function to hash the user's password
-async function hash(rawPassword){
+function hash(rawPassword){
   //https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
-  const encoder = new TextEncoder();
-  const data = encoder.encode(rawPassword);
-  const hashedPassword = await crypto.subtle.digest("SHA-256", data);
-  return hashedPassword;
+  // const encoder = new TextEncoder();
+  // const data = encoder.encode(rawPassword);
+  // const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  // const hashArray = Array.from(new Uint8Array(hashBuffer));
+  // const hashHex = hashArray
+  //   .map((b) => b.toString(16).padStart(2, "0"))
+  //   .join(""); // convert bytes to hex string
+
+  //https://www.geeksforgeeks.org/how-to-create-hash-from-string-in-javascript/
+  // only hexadecimal digits
+  hash = crypto.getHashes();
+  //console.log(hash);
+  hashPwd = crypto.createHash('sha256').update(rawPassword).digest('hex');
+  return hashPwd;
 }
 
 function passwordGenerator(rawPassword, salt){
   var improvedPassword = "";
-  improvedPassword = salt(rawPassword, salt);
-  improvedPassword = pepper(improvedPassword, generatePepper);
+  improvedPassword = addSalt(rawPassword, salt);
+  improvedPassword = addPepper(improvedPassword, generatePepper);
   improvedPassword = hash(improvedPassword);
   return improvedPassword;
 }
@@ -98,6 +117,7 @@ function antiSQLi(input) {
   for(let i=0, len=illegalPhrases.length; i<len; i++) {
     if (inputUpper.includes(illegalPhrases[i])) {
       clean = false;
+      console.log("SQL injection on " + input);
     }
   }
   return clean;
@@ -132,14 +152,25 @@ function sendEmail(email, code){
 
 function gen2fa(){
   const twoFaNum = new Uint16Array(1);
-  crypto.getRandomValues(twoFaNum);
+  webcrypto.getRandomValues(twoFaNum);
   let numtext = twoFaNum[0];
   console.log(numtext);
 
   return numtext;
 }
 
-
+function generateSessionId(){
+  var idtext = "";
+  // gets 25 random chars from allChars constant
+  for(let i=0; i<25; i++){
+    var pos = Math.floor(Math.random() * allChars.length);
+    idtext += allChars.charAt(pos);
+  }
+  session = crypto.getHashes();
+  sessionid = crypto.createHash('sha256').update(idtext).digest('hex');
+  //console.log(numtext);
+  return sessionid;
+}
  
 function dbQuery(query) {
   const client = new Client({
@@ -151,9 +182,7 @@ function dbQuery(query) {
   });
   
   client.connect();
-
-  if(antiSQLi(query) == true){
-    console.log("Querying database: ", query);
+  console.log("Querying database: ", query);
     client
       .query(query)
       .then(res => {
@@ -162,13 +191,7 @@ function dbQuery(query) {
         return res.rows;
       })
     .catch(err => console.error(err.stack));
-  } else {
-    console.log("Detected SQL injection on query: ");
-    console.log(query);
-    client.end();
-    console.log("Ended connection without running query");
-    return null;
-  }
+
 }
 
 app.post("/add-user", (req, res) => {
@@ -180,7 +203,7 @@ app.post("/add-user", (req, res) => {
   }
   var salt = generateSalt();
   dbQuery("INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('"
-  + req.body.username + "', '" + passwordGenerator(req.body.password, salt) + "', '" + req.body.email + "', '"+ salt + "', 1)");
+  + req.body.username + "', '" + passwordGenerator(req.body.password, salt) + "', '" + req.body.email + "', '" + generateSessionId() + "', '" + gen2fa() + "', '" + salt + "')");
   console.log("User added!");
   res.send("User added!");
   return res;
