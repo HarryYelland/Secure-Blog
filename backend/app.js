@@ -61,9 +61,9 @@ async function hash(rawPassword){
   return hashedPassword;
 }
 
-function passwordGenerator(rawPassword){
+function passwordGenerator(rawPassword, salt){
   var improvedPassword = "";
-  improvedPassword = salt(rawPassword, generateSalt);
+  improvedPassword = salt(rawPassword, salt);
   improvedPassword = pepper(improvedPassword, generatePepper);
   improvedPassword = hash(improvedPassword);
   return improvedPassword;
@@ -151,28 +151,36 @@ function dbQuery(query) {
   });
   
   client.connect();
-  console.log("Querying database: ", query);
-  // await client.query(query, (err, res) => {
-  //   //console.log(err, res);
-  //   var result = res.rows;
-  //   client.end();
-  //   //console.log("Query result: ", res.rows[0]);
-  //   //console.log(result);
-  //   return result;
-  // })
 
-  client
-  .query(query)
-  .then(res => {
-    console.log(res.rows)
-    client.end()
-    return res.rows;
-  })
-  .catch(err => console.error(err.stack));
+  if(antiSQLi(query) == true){
+    console.log("Querying database: ", query);
+    client
+      .query(query)
+      .then(res => {
+        console.log(res.rows)
+        client.end()
+        return res.rows;
+      })
+    .catch(err => console.error(err.stack));
+  } else {
+    console.log("Detected SQL injection on query: ");
+    console.log(query);
+    client.end();
+    console.log("Ended connection without running query");
+    return null;
+  }
 }
 
 app.post("/add-user", (req, res) => {
-  dbQuery("INSERT INTO users (username, password, email, session, two_fa) VALUES ('" + req.body.username + "', '" + req.body.password + "', '" + req.body.email + "', 'Test_Session', 1)");
+  if(antiSQLi(req.body.username) == false ||
+    antiSQLi(req.body.password) == false ||
+    antiSQLi(req.body.email) == false
+  ){
+    return null
+  }
+  var salt = generateSalt();
+  dbQuery("INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('"
+  + req.body.username + "', '" + passwordGenerator(req.body.password, salt) + "', '" + req.body.email + "', '"+ salt + "', 1)");
   console.log("User added!");
   res.send("User added!");
   return res;
