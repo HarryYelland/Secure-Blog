@@ -23,15 +23,20 @@ function addSession(sessionid, userid){
       return null;
     }
   }
-  // https://usefulangle.com/post/187/nodejs-get-date-time
   let date = new Date();
   sessions.push([sessionid, userid, date])
 }
 
 function getSession(sessionid){
+  let date = new Date();
   if(sessions[i][0] == sessionid){
     // found a match
-    
+    if(sessions[i][2] + 1500 < date){
+      return sessions[i][1];
+    } else {
+      // if expired
+      return false;
+    }
   } else {
     return false
   }
