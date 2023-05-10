@@ -88,8 +88,29 @@ function passwordGenerator(rawPassword, salt){
   return improvedPassword;
 }
 
-function passwordChecker(rawPassword, pepper){
+function passwordChecker(rawPassword, salt){
+  var passwordcheck = "";
+  for(let i=0; i<allChars.length; i++){
+    passwordcheck = addSalt(rawPassword, salt);
+    passwordcheck = addPepper(passwordChecker, allChars.charAt(i));
+    passwordcheck = addHash(passwordcheck);
 
+    //Check password against db
+    pool.connect(function(err, db, done) {
+      if(err) {
+        return response.status(400).send(err)
+      } else {
+        db.query("SELECT username FROM users WHERE password = '" + passwordcheck + "'", function(err, table) {
+          done();
+          if(err){
+            return response.status(400).send(err);
+          } else {
+            return response.status(200).send(table.rows)
+          }
+        })
+      }
+    })  
+  }
 }
 
 
@@ -194,6 +215,26 @@ function dbQuery(query) {
 
 }
 
+app.post("/duplicate-user", (req, res) => {
+  //checks to see if username already taken
+  pool.connect(function(err, db, done) {
+    if(err) {
+      return res.status(400).send(err)
+    } else {
+      db.query("SELECT username FROM users WHERE username = '" + req.body.username + "'", function(err, table) {
+        done();
+        if(err){
+          return res.status(400).send(err);
+        } else {
+          res.send("User already exists")
+          return res.status(400).send("User already exists");
+        }
+      })
+    }
+  })
+  return "Creating User";
+})
+
 app.post("/add-user", (req, res) => {
 
   // generates salt for user
@@ -205,24 +246,16 @@ app.post("/add-user", (req, res) => {
     antiSQLi(req.body.email) == false
   ){
     console.log("SQL Injection detected");
-    return response.status(400).send(err);
+    return res.status(400).send(err);
   }
 
-  //checks to see if username already taken
-  // dbQuery("SELECT username FROM users WHERE username = '" + req.body.username + "'" , function(err, table) {
-  //   done();
-  //   console.log("table length " + table.length);
-  //   if(table !== []){
-  //     console.log("Username already taken");
-  //     return response.status(400).send(err);
-  //   }
-  // });
-
-
   // inserts new user into db
-  dbQuery("INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('"
+  try {
+    dbQuery("INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('"
   + req.body.username + "', '" + passwordGenerator(req.body.password, salt) + "', '" + req.body.email + "', '" + generateSessionId() + "', '" + gen2fa() + "', '" + salt + "')");
-  
+  } catch (error) {
+    return "Username Already Taken"
+  }
   //console.log("User added!");
   //res.send("User added!");
   return res;

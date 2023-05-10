@@ -7,6 +7,12 @@ const submit = () => {
     return;
   }
   alert("Submitting details...");
+  Axios.post("http://localhost:3001/duplicate-user", {
+    username: document.getElementById("username").value
+  }).then((response) => {
+    alert(response.status);
+  })
+
   Axios.post("http://localhost:3001/add-user", {
     username: document.getElementById("username").value,
     password: document.getElementById("password").value,
