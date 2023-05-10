@@ -16,6 +16,28 @@ const allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 
 var sessions = [];
 
+function addSession(sessionid, userid){
+  //check session not already added
+  for(let i=0; i<sessions.length; i++){
+    if(sessions[i][0] == sessionid){
+      return null;
+    }
+  }
+  // https://usefulangle.com/post/187/nodejs-get-date-time
+  let date = new Date();
+  sessions.push([sessionid, userid, date])
+}
+
+function getSession(sessionid){
+  if(sessions[i][0] == sessionid){
+    // found a match
+    
+  } else {
+    return false
+  }
+}
+
+
 const Pool = require('pg').Pool
 const pool = new Pool({
   user: 'postgres',
