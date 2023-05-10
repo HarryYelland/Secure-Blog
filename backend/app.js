@@ -209,14 +209,14 @@ app.post("/add-user", (req, res) => {
   }
 
   //checks to see if username already taken
-  dbQuery("SELECT username FROM users WHERE username = '" + req.body.username + "'" , function(err, table) {
-    done();
-    console.log("table length " + table.length);
-    if(table !== []){
-      console.log("Username already taken");
-      return response.status(400).send(err);
-    }
-  });
+  // dbQuery("SELECT username FROM users WHERE username = '" + req.body.username + "'" , function(err, table) {
+  //   done();
+  //   console.log("table length " + table.length);
+  //   if(table !== []){
+  //     console.log("Username already taken");
+  //     return response.status(400).send(err);
+  //   }
+  // });
 
 
   // inserts new user into db
