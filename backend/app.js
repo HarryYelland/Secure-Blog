@@ -308,3 +308,10 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
+function Enumeration(){ //Call this on failed loggin and include "error-message in HTML
+  const errorMessage = document.getElementById('error-message'); 
+  errorMessage.textContent = 'username or password is incorrect';
+  const delay = Math.floor(Math.random() * 5000) + 1000;
+  delay
+}
