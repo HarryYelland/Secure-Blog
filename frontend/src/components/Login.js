@@ -3,6 +3,9 @@ import Axios from "axios";
 
 // Function to handle submitting item to sales order
 const submit = () => {
+  Axios.get("http://localhost:3000/login-user", {
+    username: document.getElementById("username").value,
+  });
   
 };
 
@@ -18,7 +21,7 @@ function Login() {
         <label for="password" placeholder="Password">Password</label><br/>
         <input id="password" placeholder="Password" type="password"></input>
         <br/>
-        <button type="submit" id="userSubmit" onClick={submit}>Submit</button>
+        <button type="submit" id="userSubmit" onClick={submit}>Login</button>
     </form>
     <h3>New User?</h3>
     <a href="/register">Register Here!</a>
