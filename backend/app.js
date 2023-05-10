@@ -197,7 +197,7 @@ function dbQuery(query) {
 app.post("/add-user", (req, res) => {
 
   // generates salt for user
-  var salt = generateSalt();
+  let salt = generateSalt();
 
   // checks if sql injected
   if(antiSQLi(req.body.username) == false ||
@@ -292,7 +292,11 @@ app.get('/login-user', function(request, response){
     if(err) {
       return response.status(400).send(err)
     }else{
-      db.query("SELECT username, password FROM posts WHERE username IN('" + request.body.username +"'");
+     var email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
+     var twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
+     sendEmail(email, twofa)
+     console.log(email);
+     console.log(twofa);
     }
   })
 })
