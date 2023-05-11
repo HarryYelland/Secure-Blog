@@ -10,6 +10,16 @@ var nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const webcrypto = require('crypto').webcrypto;
 
+//https://www.makeuseof.com/prevent-cross-site-scripting-in-nodejs/
+// Using httpOnly means that CSS attackers get empty string.
+app.use(express.session({
+    secret: "SecureFootballBlogDSS",
+    cookie: {
+      httpOnly: true,
+      secure: true
+    }
+  }))
+
 const { Client } = require('pg');
 
 const allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
