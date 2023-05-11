@@ -140,7 +140,7 @@ function passwordChecker(rawPassword, salt){
   }
 }
 
-
+//SQLi Banned Phrases
 const illegalPhrases = [
   "SELECT",
   "INSERT",
@@ -156,7 +156,15 @@ const illegalPhrases = [
   "WHERE",
   "INTO",
   "VALUES",
-  "ORDER",
+  "ORDER"
+];
+
+// Cross Site Scripting Banned Phrases
+const illegalPhrases2 = [
+  "SCRIPT",
+  "<SCRIPT>",
+  "<SCRIPT/>",
+  "/>"
 ];
 
 function antiSQLi(input) {
@@ -170,7 +178,18 @@ function antiSQLi(input) {
   }
   return clean;
 }
- 
+
+function anticss(input) {
+  var inputUpper = input.toUpperCase();
+  var clean = true;
+  for(let i=0, len=illegalPhrases2.length; i<len; i++) {
+    if (inputUpper.includes(illegalPhrases2[i])) {
+      clean = false;
+      console.log("Cross-Site Scripting on " + input);
+    }
+  }
+  return clean;
+}
 
 function sendEmail(email, code){
 // Using resources found at https://www.w3schools.com/nodejs/nodejs_email.asp
