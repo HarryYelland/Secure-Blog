@@ -162,11 +162,44 @@ const illegalPhrases = [
 ];
 
 // Cross Site Scripting Banned Phrases
+// https://www.acunetix.com/websitesecurity/cross-site-scripting/
 const illegalPhrases2 = [
   "SCRIPT",
   "<SCRIPT>",
   "<SCRIPT/>",
-  "/>"
+  "/>",
+  "BODY",
+  "<BODY>",
+  "<BODY/>",
+  "<BODY",
+  "IMG",
+  "<IMG>",
+  "<IMG",
+  "<IMG/>",
+  "IFRAME",
+  "<IFRAME>",
+  "<IFRAME",
+  "<IFRAME/>",
+  "INPUT",
+  "<INPUT>",
+  "<INPUT/>",
+  "<INPUT",
+  "LINK",
+  "<LINK>",
+  "<LINK/>",
+  "<LINK",
+  "TABLE",
+  "<TABLE>",
+  "<TABLE/>",
+  "<TABLE",
+  "DIV",
+  "<DIV>",
+  "<DIV/>",
+  "<DIV",
+  "OBJECT",
+  "<OBJECT>",
+  "<OBJECT/>",
+  "<OBJECT"
 ];
 
 function antiSQLi(input) {
