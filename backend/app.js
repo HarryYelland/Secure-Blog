@@ -143,6 +143,7 @@ function passwordChecker(rawPassword, salt){
 }
 
 //SQLi Banned Phrases
+//https://www.stackhawk.com/blog/node-js-sql-injection-guide-examples-and-prevention/
 const illegalPhrases = [
   "SELECT",
   "INSERT",
@@ -158,7 +159,14 @@ const illegalPhrases = [
   "WHERE",
   "INTO",
   "VALUES",
-  "ORDER"
+  "ORDER",
+  'OR "="',
+  '"="',
+  "IF",
+  "OR",
+  "AND",
+  "--",
+  "=1"
 ];
 
 // Cross Site Scripting Banned Phrases
@@ -206,6 +214,12 @@ function antiSQLi(input) {
   var inputUpper = input.toUpperCase();
   var clean = true;
   for(let i=0, len=illegalPhrases.length; i<len; i++) {
+    //https://www.stackhawk.com/blog/node-js-sql-injection-guide-examples-and-prevention/
+    // checks that input is a string and not object etc.
+    if(typeof input != "string"){
+      clean = false;
+    }
+
     if (inputUpper.includes(illegalPhrases[i])) {
       clean = false;
       console.log("SQL injection on " + input);
