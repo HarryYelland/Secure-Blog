@@ -9,6 +9,7 @@ import TestPosts from "./components/TestPosts";
 import TwoFactorCheck from "./components/TwoFactorCheck";
 import MyPosts from "./components/MyPosts";
 import ViewPost from "./components/ViewPost";
+import PrivateRoutes from "./PrivateRoute";
 
 export default function App() {
 
@@ -19,12 +20,16 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/post" element={<AddPost />} />
           <Route path="/register" element={<AddUser />} />
-          <Route path="/view-all" element={<ViewPosts />} />
-          <Route path="/view" element={<ViewPost/>} />
-          <Route path="/2FA" element={<TwoFactorCheck />} />
-          <Route path="/my-posts" element={<MyPosts />} />
+
+          <Route element={<PrivateRoutes/>}>
+            <Route path="/post" element={<AddPost />} />
+            <Route path="/view-all" element={<ViewPosts />} />
+            <Route path="/view" element={<ViewPost/>} />
+            <Route path="/2FA" element={<TwoFactorCheck />} />
+            <Route path="/my-posts" element={<MyPosts />} />
+          </Route>
+          
         </Routes>
       </BrowserRouter>
       <div className="disclaimer">

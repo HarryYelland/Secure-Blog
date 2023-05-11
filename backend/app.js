@@ -12,13 +12,13 @@ const webcrypto = require('crypto').webcrypto;
 
 //https://www.makeuseof.com/prevent-cross-site-scripting-in-nodejs/
 // Using httpOnly means that CSS attackers get empty string.
-app.use(express.session({
-    secret: "SecureFootballBlogDSS",
-    cookie: {
-      httpOnly: true,
-      secure: true
-    }
-  }))
+// app.use(express.session({
+//     secret: "SecureFootballBlogDSS",
+//     cookie: {
+//       httpOnly: true,
+//       secure: true
+//     }
+//   }))
 
 const { Client } = require('pg');
 
@@ -242,6 +242,10 @@ function antiCSS(input) {
   var inputUpper = input.toUpperCase();
   var clean = true;
   for(let i=0, len=illegalPhrases2.length; i<len; i++) {
+    if(typeof input != "string"){
+      clean = false;
+    }
+
     if (inputUpper.includes(illegalPhrases2[i])) {
       clean = false;
       console.log("Cross-Site Scripting on " + input);
