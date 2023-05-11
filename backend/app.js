@@ -14,6 +14,8 @@ const { Client } = require('pg');
 
 const allChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
+var testCount = 0;
+
 var sessions = [];
 
 function addSession(sessionid, userid){
@@ -179,7 +181,7 @@ function antiSQLi(input) {
   return clean;
 }
 
-function anticss(input) {
+function antiCSS(input) {
   var inputUpper = input.toUpperCase();
   var clean = true;
   for(let i=0, len=illegalPhrases2.length; i<len; i++) {
@@ -295,6 +297,13 @@ app.post("/add-user", (req, res) => {
     return res.status(400).send(err);
   }
 
+  if(antiCSS(req.body.username) == false ||
+    antiCSS(req.body.email) == false
+  ){
+    console.log("Cross Site Scripting Detected");
+    return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
+  }
+
   // inserts new user into db
   try {
     dbQuery("INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('"
@@ -308,6 +317,20 @@ app.post("/add-user", (req, res) => {
 });
 
 app.post("/add-post", (req, res) => {
+  if(antiSQLi(req.body.postTitle) == false ||
+    antiSQLi(req.body.postText) == false    
+  ){
+    console.log("SQL Injection Detected");
+    return res.status(400).send("SQL INJECTED");
+  }
+
+  if(antiCSS(req.body.postTitle) == false ||
+    antiCSS(req.body.postText) == false
+  ){
+    console.log("Cross Site Scripting Detected");
+    return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
+  }
+
   dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 4, FALSE)");
   console.log("Post added!");
   res.send("Post added!");
@@ -367,26 +390,85 @@ app.get('/my-posts', function(request, response) {
 })
 
 app.get('/login-user', function(request, response){
+  //SQLi prevention
+  if(antiSQLi(req.body.username) == false ||
+    antiSQLi(req.body.password) == false ||
+    antiSQLi(req.body.email) == false
+  ){
+    console.log("SQL Injection detected");
+    return res.status(400).send(err);
+  }
+
+  //Cross Site Scripting Prevention
+  if(antiCSS(req.body.username) == false ||
+    antiCSS(req.body.email) == false
+  ){
+    console.log("Cross Site Scripting Detected");
+    return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
+  }
+
   pool.connect(function(err, db, done){
     if(err) {
       return response.status(400).send(err)
     }else{
-     var email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
-     var twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
-     sendEmail(email, twofa)
-     console.log(email);
-     console.log(twofa);
+
+      var email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
+      var twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
+      sendEmail(email, twofa)
+      console.log(email);
+      console.log(twofa);
     }
   })
 })
 
-sendEmail("dsssecureblogug13@hotmail.com", "1234");
+//sendEmail("dsssecureblogug13@hotmail.com", "1234");
 
 app.listen(PORT, () => {
   console.log("Running Backend server on port ", PORT);
 });
 
 module.exports = app;
+
+function testAntiSQLi(testmessage){
+  var result = antiSQLi(testmessage);
+  console.log("Test #" + testCount+":")
+  console.log("Performing AntiSQLi test on '" +testmessage + "'");
+  if(result == false){
+    console.log("Detected SQL injection. (Clean = " + result + ")\n")
+  } else {
+    console.log("No SQL injection detected. Test Passed. (Clean = " + result + ")\n")
+  }
+  testCount += 1;
+}
+
+function testCSS(testmessage){
+  var result = antiCSS(testmessage);
+  console.log("Test #" + testCount+":")
+  console.log("Performing Anti-Cross Site Scripting test on '" +testmessage + "'");
+  if(result == false){
+    console.log("Detected Cross Site Scripting. (Clean = " + result + ")\n")
+  } else {
+    console.log("No Cross Site Scripting detected. Test Passed. (Clean = " + result + ")\n")
+  }
+  testCount += 1;
+}
+
+// Test Harness for 
+function testHarness(){
+  console.log("Backend Running Test Harness");
+  console.log("To Disable This, Please Comment Line 'testHarness();' out of code");
+  console.log("-----------------------------------------------------------------");
+  testCSS("no css");
+  testCSS("<p/>")
+  testCSS("embedded<script>var i=0;</script>css")
+  testCSS("<p><script><script/><p/>");
+  testAntiSQLi("no sqli");
+  testAntiSQLi("select * from");
+  testAntiSQLi("embeddedinsertstatement");
+}
+
+testHarness();
+
 
 function Enumeration(){ //Call this on failed loggin and include "error-message in HTML
   const errorMessage = document.getElementById('error-message'); 
