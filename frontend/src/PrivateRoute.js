@@ -11,15 +11,15 @@ const PrivateRoutes = () => {
         }).then((response) => {
             //console.log(response);
             var auth = response.data
-            if(auth.toString() == "true"){
-                Axios.post("http://localhost:3001/get-front", {
-                    front: "send" + auth
-                });
+            if(auth.toString() === "true"){
+                //Axios.post("http://localhost:3001/get-front", {
+                //    front: "send" + auth
+                //});
                 return <Outlet/>
             }else{
-                Axios.post("http://localhost:3001/get-front", {
-                    front: "send" + auth
-                });
+                //Axios.post("http://localhost:3001/get-front", {
+                //    front: "send" + auth
+                //});
                 navigate('/')
             }
         });
