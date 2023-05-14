@@ -382,13 +382,13 @@ app.post("/get-front", (req, res) => {
 });
 
 app.post("/check-session", (req, res) => {
-  console.log("called session check");
-  console.log("sessionid = " + req.body.session);
-  if(req.body.session == "1"){
+  //console.log("called session check");
+  //console.log("sessionid = " + req.body.session);
+  if(req.body.session === "1"){
     console.log("returning true")
     res.send(true);
     return res;
-}
+  }
   res.send(false);
   return res;
 }
