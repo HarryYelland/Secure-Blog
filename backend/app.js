@@ -377,6 +377,24 @@ app.post("/add-user", (req, res) => {
   return res;
 });
 
+app.post("/get-front", (req, res) => {
+  console.log(req.body.front);
+});
+
+app.post("/check-session", (req, res) => {
+  console.log("called session check");
+  console.log("sessionid = " + req.body.session);
+  if(req.body.session == "1"){
+    console.log("returning true")
+    res.send(true);
+    return res;
+}
+  res.send(false);
+  return res;
+}
+);
+
+
 app.post("/add-post", (req, res) => {
   if(antiSQLi(req.body.postTitle) == false ||
     antiSQLi(req.body.postText) == false    

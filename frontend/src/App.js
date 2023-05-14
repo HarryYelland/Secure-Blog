@@ -5,7 +5,7 @@ import AddPost from "./components/AddPost";
 import AddUser from "./components/Register";
 import ViewPosts from "./components/ViewPosts";
 import Login from "./components/Login";
-import TestPosts from "./components/TestPosts";
+//import TestPosts from "./components/TestPosts";
 import TwoFactorCheck from "./components/TwoFactorCheck";
 import MyPosts from "./components/MyPosts";
 import ViewPost from "./components/ViewPost";
