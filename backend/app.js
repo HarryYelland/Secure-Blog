@@ -490,7 +490,8 @@ app.get('/login-user', function(request, response){
     if(err) {
       return response.status(400).send(err)
     }else{
-
+      //var newFa = gen2fa();
+      //db.query("UPDATE users SET two_fa = newFa")
       var email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
       var twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
       sendEmail(email, twofa)
@@ -500,7 +501,20 @@ app.get('/login-user', function(request, response){
   })
 })
 
-//sendEmail("dsssecureblogug13@hotmail.com", "1234");
+function testChange(){
+  pool.connect(function(err, db, done){
+    if(err){
+      return response.status(400).send(err)
+    } else {
+      var newFa = gen2fa();
+      db.query("UPDATE users SET two_fa  WHERE username IN('addam')");
+      console.log("Successfully changed the two_fa of username addam")
+    }
+  })
+}
+
+testChange();
+//sendEmail("kingaj4ever@gmail.com", gen2fa());
 
 app.listen(PORT, () => {
   console.log("Running Backend server on port ", PORT);
@@ -549,7 +563,7 @@ function testHarness(){
 testHarness();
 
 
-function Enumeration(){ //Call this on failed loggin and include "error-message in HTML
+function Enumeration(){ //Call this on failed login and include "error-message in HTML
   const errorMessage = document.getElementById('error-message'); 
   errorMessage.textContent = 'username or password is incorrect';
   const delay = Math.floor(Math.random() * 5000) + 1000;
