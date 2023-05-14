@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
 
-// Function to handle submitting item to sales order
+// Function to login user
 const submit = () => {
   Axios.get("http://localhost:3000/login-user", {
     username: document.getElementById("username").value,
+    two_fa: document.getElementById("testfa").value
   });
   
 };

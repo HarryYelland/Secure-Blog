@@ -490,30 +490,17 @@ app.get('/login-user', function(request, response){
     if(err) {
       return response.status(400).send(err)
     }else{
-      //var newFa = gen2fa();
-      //db.query("UPDATE users SET two_fa = newFa")
+      //db.query("UPDATE users SET two_fa = ('" gen2fa() '") WHERE username IN ('" + request.body.username" ))  <--- This line should add the 2fa to the corresponding record
       var email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
       var twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
       sendEmail(email, twofa)
-      console.log(email);
-      console.log(twofa);
+      console.log("the email is" + email);
+      console.log("the two_Fa is" + twofa);
     }
   })
 })
 
-function testChange(){
-  pool.connect(function(err, db, done){
-    if(err){
-      return response.status(400).send(err)
-    } else {
-      var newFa = gen2fa();
-      db.query("UPDATE users SET two_fa  WHERE username IN('addam')");
-      console.log("Successfully changed the two_fa of username addam")
-    }
-  })
-}
 
-testChange();
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
 
 app.listen(PORT, () => {
@@ -560,7 +547,7 @@ function testHarness(){
   testAntiSQLi("embeddedinsertstatement");
 }
 
-testHarness();
+//testHarness();
 
 
 function Enumeration(){ //Call this on failed login and include "error-message in HTML
