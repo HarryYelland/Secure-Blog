@@ -7,15 +7,20 @@ const submit = () => {
     session: sessionStorage.getItem("session"),
     code: document.getElementById("2fa")
   }).then((response) => {
-    window.location.href("/view")
+    
   });
+  window.location.href("/view")
 };
 
 // Main function for adding a product to a sales order page
 function TwoFactorCheck() {
-  Axios.post("http://localhost:3001/create-2fa",{
-    session: sessionStorage.getItem("session")
-  });
+  var sessionid = sessionStorage.getItem("session");
+  if(sessionid === ""){
+    window.location.href = "/";
+  }
+  //Axios.post("http://localhost:3001/create-2fa",{
+  //  session: sessionid 
+  //});
   return (
     <div>
       <h2>Enter 2 FA Code</h2>
