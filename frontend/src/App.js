@@ -21,12 +21,12 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<AddUser />} />
+          <Route path="/2FA" element={<TwoFactorCheck />} />
 
           <Route element={<PrivateRoutes/>}>
             <Route path="/post" element={<AddPost />} />
             <Route path="/view-all" element={<ViewPosts />} />
             <Route path="/view" element={<ViewPost/>} />
-            <Route path="/2FA" element={<TwoFactorCheck />} />
             <Route path="/my-posts" element={<MyPosts />} />
           </Route>
           

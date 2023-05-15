@@ -35,25 +35,72 @@ function addSession(sessionid, userid){
       return null;
     }
   }
-  let date = new Date();
+
+  //pre-expired so user will have to go through 2fa authentication
+  let date = new Date(Date.now());
+  date.setMinutes(date.getMinutes() - 30);
+  
   sessions.push([sessionid, userid, date])
 }
 
-function getSession(sessionid){
-  let date = new Date();
-  if(sessions[i][0] == sessionid){
-    // found a match
-    if(sessions[i][2] + 1500 < date){
-      return sessions[i][1];
-    } else {
-      // if expired
-      return false;
+function findSession(userid){
+  for(let i=0; i<sessions.length; i++){
+    if(sessions[i][1] == userid){
+      return sessions[i][0];
     }
-  } else {
-    return false
   }
+  return -1;
 }
 
+function getSession(sessionid){
+  console.log("checking session " + sessionid + " against " + sessions[0][0])
+  let date = new Date(Date.now());
+  for(let i=0; i<sessions.length; i++){
+    if(sessions[i][0] == sessionid){
+      // found a match
+      console.log(session[i][2]);
+      if(sessions[i][2] > date){
+        return true;
+      } else {
+        //send user back to 2fa auth if session expired
+        return "auth";
+      }
+    }
+  }
+  return false;
+}
+
+function generateSessionId(){
+  var idtext = "";
+  // gets 25 random chars from allChars constant
+  for(let i=0; i<25; i++){
+    var pos = Math.floor(Math.random() * allChars.length);
+    idtext += allChars.charAt(pos);
+  }
+  session = crypto.getHashes();
+  sessionid = crypto.createHash('sha256').update(idtext).digest('hex');
+  //console.log(numtext);
+  return sessionid;
+}
+
+app.post("/check-session", (req, res) => {
+  var newSession = req.body.session;
+  if(getSession(newSession) === true){
+    console.log("returning true")
+    res.send(true);
+    return res;
+  } else if (getSession(newSession) === "auth"){
+    res.send("auth");
+    return res;
+  }
+  res.send(false);
+  return res;
+}
+);
+
+//addSession(generateSessionId(), 1)
+console.log("///");
+console.log(sessions);
 
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -173,8 +220,6 @@ const illegalPhrases = [
   'OR "="',
   '"="',
   "IF",
-  "OR",
-  "AND",
   "--",
   "=1"
 ];
@@ -289,18 +334,7 @@ function gen2fa(){
   return numtext;
 }
 
-function generateSessionId(){
-  var idtext = "";
-  // gets 25 random chars from allChars constant
-  for(let i=0; i<25; i++){
-    var pos = Math.floor(Math.random() * allChars.length);
-    idtext += allChars.charAt(pos);
-  }
-  session = crypto.getHashes();
-  sessionid = crypto.createHash('sha256').update(idtext).digest('hex');
-  //console.log(numtext);
-  return sessionid;
-}
+
  
 function dbQuery(query) {
   const client = new Client({
@@ -320,7 +354,7 @@ function dbQuery(query) {
         client.end()
         return res.rows;
       })
-    .catch(err => console.error(err.stack));
+    .catch(err => {return err});
 
 }
 
@@ -336,7 +370,7 @@ app.post("/duplicate-user", (req, res) => {
           return res.status(400).send(err);
         } else {
           res.send("User already exists")
-          return res.status(400).send("User already exists");
+          //return res.status(400).send("User already exists");
         }
       })
     }
@@ -344,7 +378,7 @@ app.post("/duplicate-user", (req, res) => {
   return "Creating User";
 })
 
-app.post("/add-user", (req, res) => {
+app.post("/add-user", async (req, res) => {
 
   // generates salt for user
   let salt = generateSalt();
@@ -355,7 +389,7 @@ app.post("/add-user", (req, res) => {
     antiSQLi(req.body.email) == false
   ){
     console.log("SQL Injection detected");
-    return res.status(400).send(err);
+    return res.status(400).send("SQL injection detected");
   }
 
   if(antiCSS(req.body.username) == false ||
@@ -369,30 +403,46 @@ app.post("/add-user", (req, res) => {
   try {
     dbQuery("INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('"
   + req.body.username + "', '" + passwordGenerator(req.body.password, salt) + "', '" + req.body.email + "', '" + generateSessionId() + "', '" + gen2fa() + "', '" + salt + "')");
+  
+  console.log("getting id");
+
+  var id = -1;
+  //id = await dbQuery("SELECT user_id FROM users WHERE username = '" + req.body.username + "'");
+  pool.connect(function(err, db, done) {
+    if(err) {
+      return res.status(400).send(err)
+    } else {
+      db.query("SELECT user_id FROM users WHERE username = '" + req.body.username + "'", function(err, table) {
+        done();
+        if(err){} else {
+          //console.log(table.rows);
+          id = table.rows[0].user_id;
+          addSession(generateSessionId(), id);
+          console.log("sessions");
+          console.log(sessions)
+          var sessionid = findSession(id);
+          console.log("sessionid = " + sessionid);
+          res.send(sessionid);
+          return sessionid;
+        }
+      })
+    }
+  })
   } catch (error) {
+    res.send("Username Already Taken");
     return "Username Already Taken"
   }
+
+  
   //console.log("User added!");
   //res.send("User added!");
   return res;
 });
 
+//function for testing what is received from frontend (For testing purposes only)
 app.post("/get-front", (req, res) => {
   console.log(req.body.front);
 });
-
-app.post("/check-session", (req, res) => {
-  //console.log("called session check");
-  //console.log("sessionid = " + req.body.session);
-  if(req.body.session === "1"){
-    console.log("returning true")
-    res.send(true);
-    return res;
-  }
-  res.send(false);
-  return res;
-}
-);
 
 
 app.post("/add-post", (req, res) => {
@@ -468,7 +518,7 @@ app.get('/my-posts', function(request, response) {
   })
 })
 
-app.get('/login-user', function(request, response){
+app.get('/login-user', function(req, res){
   //SQLi prevention
   if(antiSQLi(req.body.username) == false ||
     antiSQLi(req.body.password) == false ||
@@ -497,8 +547,51 @@ app.get('/login-user', function(request, response){
       sendEmail(email, twofa)
       console.log(email);
       console.log(twofa);
+      var id = db.query("SELECT user_id FROM users WHERE username IN('" + request.body.username +"'");
+      addSession(generateSessionId(), id);
     }
   })
+})
+
+app.post('/check-2fa', function(req, res){
+  var session = req.body.session;
+  var id = -1;
+  //SQLi prevention
+  if(antiSQLi(req.body.code) === false ||
+  antiSQLi(session === false)
+  ){
+    console.log("SQL Injection detected");
+    return res.status(400).send(err);
+  }
+
+  //Cross Site Scripting Prevention
+  if(antiSQLi(req.body.code) == false ||
+  antiSQLi(session === false)
+  ){
+    console.log("Cross Site Scripting Detected");
+    return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
+  }
+
+  for(let i=0; i<sessions.length; i++){
+    if(sessions[i][0] == sessionid){
+      // found a match
+      //console.log(session[i][2]);
+      id = session[i][1];
+    }
+  }
+
+  pool.connect(function(err, db, done) {
+    if(err) {
+      return response.status(400).send(err)
+    } else {
+      db.query("SELECT two_fa FROM users WHERE user_id = '" + id + "'", function(err, table) {
+        done();
+        console.log(response);
+      })
+    }
+  })
+
+
 })
 
 function testChange(){
@@ -513,7 +606,7 @@ function testChange(){
   })
 }
 
-testChange();
+//testChange();
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
 
 app.listen(PORT, () => {
