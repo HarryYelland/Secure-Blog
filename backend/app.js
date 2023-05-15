@@ -374,7 +374,7 @@ app.post("/add-user", (req, res) => {
   }
   //console.log("User added!");
   //res.send("User added!");
-  return res;
+  //return res;
 });
 
 app.post("/get-front", (req, res) => {
