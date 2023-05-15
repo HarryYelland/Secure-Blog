@@ -41,6 +41,7 @@ function addSession(sessionid, userid){
   sessions.push([sessionid, userid, date])
 }
 
+
 function getSession(sessionid){
   console.log("checking session " + sessionid + " against " + sessions[0][0]);
   let date = new Date(Date.now());
@@ -399,13 +400,16 @@ app.post("/add-user", (req, res) => {
     antiSQLi(req.body.password) == false ||
     antiSQLi(req.body.email) == false
   ){
+    //if injected, returns error
     console.log("SQL Injection detected");
     return res.status(400).send("SQL injection detected");
   }
 
+  // checks if cross site scripting injected
   if(antiCSS(req.body.username) == false ||
     antiCSS(req.body.email) == false
   ){
+    //if injected, returns error
     console.log("Cross Site Scripting Detected");
     return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
   }
@@ -519,6 +523,8 @@ app.get('/post', function(request, response) {
 })
 
 app.get('/my-posts', function(request, response) {
+  var session = req.body.session;
+  
   pool.connect(function(err, db, done) {
     if(err) {
       return response.status(400).send(err)
