@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
 
-// Function to handle submitting item to sales order
 const submit = () => {
   Axios.get("http://localhost:3000/login-user", {
     session: sessionStorage.getItem("session"),

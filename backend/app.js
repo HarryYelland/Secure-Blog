@@ -540,58 +540,16 @@ app.get('/login-user', function(req, res){
     if(err) {
       return response.status(400).send(err)
     }else{
-      //var newFa = gen2fa();
-      //db.query("UPDATE users SET two_fa = newFa")
+      //db.query("UPDATE users SET two_fa = ('" gen2fa() '") WHERE username IN ('" + request.body.username" ))  <--- This line should add the 2fa to the corresponding record
       var email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
       var twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
       sendEmail(email, twofa)
-      console.log(email);
-      console.log(twofa);
+      console.log("the email is" + email);
+      console.log("the two_Fa is" + twofa);
       var id = db.query("SELECT user_id FROM users WHERE username IN('" + request.body.username +"'");
       addSession(generateSessionId(), id);
     }
   })
-})
-
-app.post('/check-2fa', function(req, res){
-  var session = req.body.session;
-  var id = -1;
-  //SQLi prevention
-  if(antiSQLi(req.body.code) === false ||
-  antiSQLi(session === false)
-  ){
-    console.log("SQL Injection detected");
-    return res.status(400).send(err);
-  }
-
-  //Cross Site Scripting Prevention
-  if(antiSQLi(req.body.code) == false ||
-  antiSQLi(session === false)
-  ){
-    console.log("Cross Site Scripting Detected");
-    return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
-  }
-
-  for(let i=0; i<sessions.length; i++){
-    if(sessions[i][0] == sessionid){
-      // found a match
-      //console.log(session[i][2]);
-      id = session[i][1];
-    }
-  }
-
-  pool.connect(function(err, db, done) {
-    if(err) {
-      return response.status(400).send(err)
-    } else {
-      db.query("SELECT two_fa FROM users WHERE user_id = '" + id + "'", function(err, table) {
-        done();
-        console.log(response);
-      })
-    }
-  })
-
-
 })
 
 function testChange(){
@@ -606,7 +564,7 @@ function testChange(){
   })
 }
 
-//testChange();
+testChange();
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
 
 app.listen(PORT, () => {
@@ -653,7 +611,7 @@ function testHarness(){
   testAntiSQLi("embeddedinsertstatement");
 }
 
-testHarness();
+//testHarness();
 
 
 function Enumeration(){ //Call this on failed login and include "error-message in HTML
