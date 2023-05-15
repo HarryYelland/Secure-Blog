@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Axios from "axios";
 
 const submit = () => {
+  alert("Submitting Code");
   Axios.post("http://localhost:3001/check-2fa", {
     session: sessionStorage.getItem("session"),
     code: document.getElementById("2fa")
