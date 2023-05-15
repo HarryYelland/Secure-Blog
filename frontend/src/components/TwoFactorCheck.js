@@ -2,11 +2,19 @@ import { useState, useEffect } from "react";
 import Axios from "axios";
 
 const submit = () => {
-  
+  Axios.post("http://localhost:3001/check-2fa", {
+    session: sessionStorage.getItem("session"),
+    code: document.getElementById("2fa")
+  }).then((response) => {
+    window.location.href("/view")
+  });
 };
 
 // Main function for adding a product to a sales order page
-function TwoFactorCheck() {  
+function TwoFactorCheck() {
+  Axios.post("http://localhost:3001/create-2fa",{
+    session: sessionStorage.getItem("session")
+  });
   return (
     <div>
       <h2>Enter 2 FA Code</h2>

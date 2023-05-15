@@ -18,8 +18,11 @@ const submit = () => {
     password: document.getElementById("password").value,
     email: document.getElementById("email").value,
   }).then((response) => {
-    console.log(response);
-    alert("User Created!");
+    var data = response;
+    sessionStorage.setItem("session", data.data);
+    console.log(data.data);
+    alert("New User Created: " + data);
+    //console.log(sessionStorage.getItem("session"));
   });
 };
 
