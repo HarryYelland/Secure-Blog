@@ -447,7 +447,7 @@ app.post("/add-user", (req, res) => {
 
   //console.log("User added!");
   //res.send("User added!");
-  //return res;
+  ////return res;
 });
 
 app.post("/check-session", (req, res) => {
@@ -505,7 +505,7 @@ app.get('/all-posts', function(request, response) {
 app.get('/post', function(request, response) {
   pool.connect(function(err, db, done) {
     if(err) {
-      return response.status(400).send(err)
+      return response.status(400).send(err);
     } else {
       db.query("SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE post_id = '" + request.body.postid + "'", function(err, table) {
         done();
@@ -541,36 +541,42 @@ app.get('/my-posts', function(request, response) {
 
 app.get('/login-user', function(request, response){
   //SQLi prevention
-  if(antiSQLi(req.body.username) == false ||
-    antiSQLi(req.body.password) == false ||
-    antiSQLi(req.body.email) == false
+/*  if(antiSQLi(require.body.username) == false,
+    antiSQLi(require.body.password) == false
   ){
     console.log("SQL Injection detected");
-    return res.status(400).send(err);
+    return response.status(400).send(err);
   }
 
   //Cross Site Scripting Prevention
-  if(antiCSS(req.body.username) == false ||
-    antiCSS(req.body.email) == false
+  if(antiCSS(require.body.username) == false,
+    antiCSS(require.body.password) == false
   ){
     console.log("Cross Site Scripting Detected");
-    return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
-  }
+    return response.status(400).send("CROSS SITE SCRIPTING DETECTED");
+  }*/
 
-  pool.connect(function(err, db, done){
+  alert("SUCCESSFUL");
+
+/*  pool.connect(function(err, db, done){
     if(err) throw err;
-    let sql = ("UPDATE users SET two_fa = " + gen2fa() + " WHERE username = '" + request.body.username + "'");
+    let sql = ("UPDATE users SET two_fa = + gen2fa() + WHERE username IN '" + request.body.username + "'");
     db.query(sql, function(err, result){
       if(err) throw err;
       console.log("SUCCESSFUL")
     });
+
     let email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
     let twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
     sendEmail(email, twofa)
     response.send("The details are:" + email + twofa);
     return response;
-  });
+  });*/
 });
+
+app.get('/log-use', function (request, response){
+  alert("success");
+    });
 
 
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
