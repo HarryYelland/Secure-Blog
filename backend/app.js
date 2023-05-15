@@ -518,6 +518,37 @@ app.get('/my-posts', function(request, response) {
   })
 })
 
+app.post('/check-2fa', function(req, res){
+  console.log("Checking 2fa code")
+  var session = req.body.session;
+  var code = req.body.code;
+  var id = findSession(session);
+  var correct = db.query("SELECT two_fa FROM users WHERE user_id =" + id);
+  if(correct === code){
+    for(let i=0; i<sessions.length; i++){
+      if(sessions[i][0] == session){
+        // found a match
+        let date = new Date(Date.now());
+        date.setMinutes(date.getMinutes() + 30);
+        session[i][2] = date;
+        console.log("changed date");
+      }
+    }
+  }
+})
+
+app.post('/create-2fa', function(req, res){
+  console.log("creating 2fa check for " + req.body.session);
+  var id = req.body.session;
+  for(let i=0; i<sessions.length; i++){
+    if(sessions[i][0] == id){
+      // found a match
+      twofactor(sessions[i][1]);
+    }
+  }
+})
+
+
 app.get('/login-user', function(req, res){
   //SQLi prevention
   if(antiSQLi(req.body.username) == false ||
@@ -552,19 +583,38 @@ app.get('/login-user', function(req, res){
   })
 })
 
-function testChange(){
-  pool.connect(function(err, db, done){
+function twofactor(id){
+  pool.connect(async function(err, db, done){
     if(err){
       return response.status(400).send(err)
     } else {
       var newFa = gen2fa();
-      db.query("UPDATE users SET two_fa  WHERE username IN('addam')");
-      console.log("Successfully changed the two_fa of username addam")
+      var email = "";
+      
+      pool.connect(function(err, db, done) {
+        if(err) {
+          return response.status(400).send(err)
+        } else {
+          // Change the user_id later when this is implemented
+          db.query("SELECT email FROM users WHERE user_id = " + id, function(err, table) {
+            done();
+            if(err){
+              return response.status(400).send(err);
+            } else {
+              email = table.rows[0].email;
+              console.log(email);
+              sendEmail(email, newFa);
+            }
+          })
+        }
+      })
+
+      
     }
   })
 }
 
-testChange();
+//testChange();
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
 
 app.listen(PORT, () => {
