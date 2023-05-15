@@ -3,9 +3,7 @@ import Axios from "axios";
 
 // Function to login user
 const submit = () => {
-  Axios.get("http://localhost:3000/login-user", {
-    username: document.getElementById("username").value,
-    password: document.getElementById("password").value,
+  Axios.get("http://localhost:3001/log-use", {
   }).then((response) => {
     alert(response.status);
   })

@@ -544,7 +544,7 @@ app.get('/my-posts', function(request, response) {
 
 app.get('/login-user', function(request, response){
   //SQLi prevention
-  if(antiSQLi(require.body.username) == false,
+/*  if(antiSQLi(require.body.username) == false,
     antiSQLi(require.body.password) == false
   ){
     console.log("SQL Injection detected");
@@ -557,22 +557,31 @@ app.get('/login-user', function(request, response){
   ){
     console.log("Cross Site Scripting Detected");
     return response.status(400).send("CROSS SITE SCRIPTING DETECTED");
-  }
+  }*/
 
-  pool.connect(function(err, db, done){
+  alert("SUCCESSFUL");
+
+/*  pool.connect(function(err, db, done){
     if(err) throw err;
-    let sql = ("UPDATE users SET two_fa = + gen2fa() + WHERE username IN '" + request.body.username + "'");
+    var username = request.body.username
+    var sql = "UPDATE users SET two_fa = gen2fa() WHERE username = " + request.body.username + "";
+
     db.query(sql, function(err, result){
       if(err) throw err;
       console.log("SUCCESSFUL")
     });
+
     let email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
     let twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
     sendEmail(email, twofa)
     response.send("The details are:" + email + twofa);
     return response;
-  });
+  });*/
 });
+
+app.get('/log-use', function (request, response){
+  alert("success");
+    });
 
 
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
