@@ -487,18 +487,19 @@ app.get('/login-user', function(request, response){
   }
 
   pool.connect(function(err, db, done){
-    if(err) {
-      return response.status(400).send(err)
-    }else{
-      //db.query("UPDATE users SET two_fa = ('" gen2fa() '") WHERE username IN ('" + request.body.username" ))  <--- This line should add the 2fa to the corresponding record
-      var email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
-      var twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
-      sendEmail(email, twofa)
-      console.log("the email is" + email);
-      console.log("the two_Fa is" + twofa);
-    }
-  })
-})
+    if(err) throw err;
+    let sql = ("UPDATE users SET two_fa = + gen2fa() + WHERE username IN '" + request.body.username + "'");
+    db.query(sql, function(err, result){
+        if(err) throw err;
+        console.log("SUCCESSFUL")
+    });
+    let email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
+    let twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
+    sendEmail(email, twofa)
+    response.send("The details are:" + email + twofa);
+    return response;
+  });
+});
 
 
 //sendEmail("kingaj4ever@gmail.com", gen2fa());

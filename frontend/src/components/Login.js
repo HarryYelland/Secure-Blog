@@ -5,8 +5,9 @@ import Axios from "axios";
 const submit = () => {
   Axios.get("http://localhost:3000/login-user", {
     username: document.getElementById("username").value,
-    two_fa: document.getElementById("testfa").value
-  });
+  }).then((response) => {
+    console.log(response);
+  })
   
 };
 
