@@ -26,7 +26,7 @@ function Login() {
     </form>
     <h3>New User?</h3>
     <a href="/register">Register Here!</a><br/>
-      <a href="/SearchPosts">Add a post!</a>
+      <a href="/post">Add a post!</a>
   </div>
   );
 }
