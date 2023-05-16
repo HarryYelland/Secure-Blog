@@ -531,7 +531,6 @@ app.get('/search-posts', async function(req, res) {
   } catch (error) {
     console.error(error.message)
   }
-
 })
 
 app.get('/all-posts', async function(req, res) {
@@ -561,24 +560,20 @@ app.get('/post', function(request, response) {
   })
 })
 
-app.get('/my-posts', function(request, response) {
-  var session = req.body.session;
-  
-  pool.connect(function(err, db, done) {
-    if(err) {
-      return response.status(400).send(err)
-    } else {
-      // Change the user_id later when this is implemented
-      db.query('SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE user_id = 1 ORDER BY post_id DESC', function(err, table) {
-        done();
-        if(err){
-          return response.status(400).send(err);
-        } else {
-          return response.status(200).send(table.rows)
-        }
-      })
-    }
-  })
+app.get('/my-posts', async function(request, response) {
+  try {
+    const { session } = req.query;
+    const userid = findSession(session)
+
+    const posts = await pool.query(
+      "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE user.user_id = $1",
+      [`%${userid}%`]
+    )
+
+    res.json(posts.rows)
+  } catch (error) {
+    console.error(error.message)
+  }
 })
 
 app.get('/login-user', function(request, response){

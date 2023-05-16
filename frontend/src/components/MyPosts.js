@@ -1,30 +1,64 @@
-//https://blog.logrocket.com/getting-started-with-postgres-in-your-react-app/
+import React, {Fragment, useState, useEffect} from 'react';
+import './style.css';
 
-import React, {useState, useEffect} from 'react';
+function SearchPosts() {
+    const [posts, setPosts] = useState([])
+    const [refreshes, setRefreshes] = useState(0)
+    const session = sessionStorage.getItem("session");
+    
+    const onLoad = async () => {
+      console.log("onload")
+      //e.preventDefault();
+      try {
+        const response = await fetch(`http://localhost:3001/my-posts/?session=${session}`);
+        const parseResponse = await response.json();
 
-function MyPosts() {
-  const [posts, setPosts] = useState(false);
-  var allPosts = [];
-  useEffect(() => {
-    getPosts();
-  }, []);
-  function getPosts() {
-    fetch('http://localhost:3001/my-posts')
-      .then(response => {
-        response.json()
-        .then(function(data) {
-          //console.log(data);
-          for (let i = 0; i < data.length; i++) {
-            allPosts.push([data[i].post_id, data[i].username, data[i].post_title, data[i].post_body]);
-          }
-        })
-      })
-    console.log(allPosts);
-  }
-  return (
-    <div>
-      {allPosts.toString() ? allPosts.toString() : 'There is no post data available'}
-    </div>
-  );
+        //console.log(parseResponse);
+        setPosts(parseResponse);
+        setRefreshes(1);
+      } catch (error) {
+        console.error(error.message)
+      }
+    }
+
+    if(refreshes === 0){
+      onLoad();
+    }
+    
+
+    return (
+      <Fragment>
+        <a href="/post">Make a post</a>
+        <a href="/view-all">View all posts</a>
+        <a href="/search">Search Posts</a>
+        <a href="/my-posts">My Posts</a>
+        <h2>Searched Posts</h2>
+        <br/>
+        <div className='container'>
+        <table>
+          <thead>
+            <tr>
+              <th>Post Number</th>
+              <th>Post Title</th>
+              <th>Post Body</th>
+              <th>Author</th>
+            </tr>
+          </thead>
+          <tbody>
+              {
+                posts.map(post => (
+                  <tr>
+                    <td>{post.post_id}</td>
+                    <td>{post.post_title}</td>
+                    <td>{post.post_body}</td>
+                    <td>{post.username}</td>
+                  </tr>
+                ))
+              }
+          </tbody>
+        </table>
+        </div>
+      </Fragment>
+    )   
 }
-export default MyPosts;
+export default SearchPosts;

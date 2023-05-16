@@ -28,6 +28,9 @@ function SearchPosts() {
     return (
       <Fragment>
         <a href="/post">Make a post</a>
+        <a href="/view-all">View all posts</a>
+        <a href="/search">Search Posts</a>
+        <a href="/my-posts">My Posts</a>
         <h2>Searched Posts</h2>
         <br/>
         <div className='container'>
