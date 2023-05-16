@@ -1,10 +1,8 @@
-import React from "react";
+import Axios from "axios";
 
-const Post = ({ title, body }) => (
-  <div>
-    <h2>{title}</h2>
-    <p>{body}</p>
-  </div>
-);
+const submit =() => {
+
+}
+
 
 export default Post;

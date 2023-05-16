@@ -466,8 +466,12 @@ app.post("/add-user", (req, res) => {
 
   //console.log("User added!");
   //res.send("User added!");
+/*<<<<<<< HEAD
+  return res;
+=======
   ////return res;
-});
+>>>>>>> 529b41a1486b6687c5f2043554d08454c66c40f6
+});*/
 
 app.post("/check-session", (req, res) => {
   //console.log("called session check");
@@ -501,6 +505,14 @@ app.post("/add-post", (req, res) => {
   dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 4, FALSE)");
   console.log("Post added!");
   res.send("Post added!");
+  return res;
+});
+
+
+app.post("/delete-post", (req, res) => {
+  dbQuery("DELETE FROM posts WHERE post_title = 'Test_Post'");
+  res.send("Post deleted");
+  
   return res;
 });
 
@@ -565,7 +577,7 @@ app.get('/my-posts', async function(request, response) {
 
 app.get('/login-user', function(request, response){
   //SQLi prevention
-/*  if(antiSQLi(require.body.username) == false,
+  if(antiSQLi(require.body.username) == false,
     antiSQLi(require.body.password) == false
   ){
     console.log("SQL Injection detected");
@@ -578,13 +590,11 @@ app.get('/login-user', function(request, response){
   ){
     console.log("Cross Site Scripting Detected");
     return response.status(400).send("CROSS SITE SCRIPTING DETECTED");
-  }*/
+  }
 
-  alert("SUCCESSFUL");
-
-/*  pool.connect(function(err, db, done){
+  pool.connect(function(err, db, done){
     if(err) throw err;
-    let sql = ("UPDATE users SET two_fa = + gen2fa() + WHERE username IN '" + request.body.username + "'");
+    const sql = "UPDATE users SET two_fa = gen2fa() WHERE username = " + request.body.username + "";
     db.query(sql, function(err, result){
       if(err) throw err;
       console.log("SUCCESSFUL")
@@ -594,14 +604,8 @@ app.get('/login-user', function(request, response){
     let twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
     sendEmail(email, twofa)
     response.send("The details are:" + email + twofa);
-    return response;
-  });*/
+  })
 });
-
-app.get('/log-use', function (request, response){
-  alert("success");
-    });
-
 
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
 
@@ -708,4 +712,4 @@ function Enumeration(){ //Call this on failed login and include "error-message i
   errorMessage.textContent = 'username or password is incorrect';
   const delay = Math.floor(Math.random() * 5000) + 1000;
   delay
-}
+}})
