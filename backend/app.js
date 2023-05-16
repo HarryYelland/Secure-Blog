@@ -498,16 +498,8 @@ app.post("/add-post", (req, res) => {
     return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
   }
 
-
-  var isPriv = "FALSE"
-  if (req.body.private.checked == true){
-    console.log("THIS IS A PRIVATE POST");
-    isPriv = "TRUE";
-  };
-
   dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('"+ req.body.postTitle +"', '" + req.body.postText + "', 1, '" + isPriv + "'");
   console.log("Post added!");
-  console.log(privacy);
   res.send("Post added!");
   return res;
 });
