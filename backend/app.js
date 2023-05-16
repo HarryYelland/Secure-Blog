@@ -509,6 +509,14 @@ app.post("/add-post", (req, res) => {
 });
 
 
+app.post("/delete-post", (req, res) => {
+  dbQuery("DELETE FROM posts WHERE post_title = 'Test_Post'");
+  res.send("Post deleted");
+  
+  return res;
+});
+
+
 app.get('/search-posts', async function(req, res) {
   try {
     const { search } = req.query;
