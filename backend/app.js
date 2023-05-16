@@ -485,6 +485,26 @@ app.post("/add-post", (req, res) => {
   return res;
 });
 
+
+app.get('/search-posts', function(request, response) {
+  console.log("called search posts")
+  console.log(req.body.search)
+  pool.connect(function(err, db, done) {
+    if(err) {
+      return response.status(400).send(err)
+    } else {
+      db.query("SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE is_private = FALSE AND post_title LIKE '" + req.body.title + "' ORDER BY post_id DESC", function(err, table) {
+        done();
+        if(err){
+          return response.status(400).send(err);
+        } else {
+          return response.status(200).send(table.rows)
+        }
+      })
+    }
+  })
+})
+
 app.get('/all-posts', function(request, response) {
   pool.connect(function(err, db, done) {
     if(err) {
