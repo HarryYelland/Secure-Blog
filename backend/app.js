@@ -516,13 +516,16 @@ app.post("/add-post", async(req, res) => {
   }
 
   
+  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES (?, ?, 4, FALSE)", [title, text]);
+  console.log("Post added!");
+  res.send("Post added!");
+  return res;
 });
 
 
 app.post("/delete-post", (req, res) => {
-  dbQuery("DELETE FROM posts WHERE post_title = 'Test_Post'");
+  dbQuery("DELETE FROM posts WHERE post_title = '"+ req.body.post_id +"'");
   res.send("Post deleted");
-  
   return res;
 });
 
