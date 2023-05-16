@@ -498,8 +498,16 @@ app.post("/add-post", (req, res) => {
     return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
   }
 
-  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 4, FALSE)");
+
+  var isPriv = "FALSE"
+  if (req.body.private.checked == true){
+    console.log("THIS IS A PRIVATE POST");
+    isPriv = "TRUE";
+  };
+
+  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('"+ req.body.postTitle +"', '" + req.body.postText + "', 1, '" + isPriv + "'");
   console.log("Post added!");
+  console.log(privacy);
   res.send("Post added!");
   return res;
 });
@@ -588,12 +596,12 @@ app.get('/login-user', function(request, response){
 
   alert("SUCCESSFUL");
 
-/*  pool.connect(function(err, db, done){
+  /*pool.connect(function(err, db, done){
     if(err) throw err;
     let sql = ("UPDATE users SET two_fa = + gen2fa() + WHERE username IN '" + request.body.username + "'");
     db.query(sql, function(err, result){
       if(err) throw err;
-      console.log("SUCCESSFUL")
+      alert("SUCCESSFUL");
     });
 
     let email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");

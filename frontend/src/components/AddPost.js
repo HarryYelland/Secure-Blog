@@ -26,7 +26,7 @@ function verify(){
 function AddPost() {  
   return (
     <div>
-      <h2>New post!</h2>
+      <h2>Make a new post!</h2>
       <form>
         <label for="postTitle">Make a title!</label><br/>
         <input type="text" id="postTitle"/><br/>
@@ -34,8 +34,12 @@ function AddPost() {
         <label for="postText" placeholder="Type anything here! (within reason lol)">Post something here!</label><br/>
         <textarea id="postText" placeholder="Type anything here! (within reason lol)" cols="40" rows="10"></textarea>
         <br/>
+          <label for="private">Private post</label>
+          <input type="checkbox" id="private"></input><br/>
         <button type="submit" id="postSubmit" onClick={submit}>Submit</button>
     </form>
+        <br/>
+        <a href ="/view-all">See all posts!</a>
   </div>
   );
 }
