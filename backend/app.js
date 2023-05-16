@@ -501,6 +501,8 @@ app.post("/add-post", async(req, res) => {
     console.log("Cross Site Scripting Detected");
     return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
   }
+  const title = req.body.postTitle;
+  const text = req.body.postText;
 
   var user_id = findSession(req.body.session)
 
@@ -515,11 +517,7 @@ app.post("/add-post", async(req, res) => {
     
   }
 
-  
-  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES (?, ?, 4, FALSE)", [title, text]);
-  console.log("Post added!");
-  res.send("Post added!");
-  return res;
+
 });
 
 
