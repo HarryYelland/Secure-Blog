@@ -509,12 +509,18 @@ app.get('/search-posts', async function(req, res) {
   try {
     const { search } = req.query;
 
-    const posts = await pool.query(
-      "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE post_title ILIKE $1 AND is_private = FALSE",
-      [`%${search}%`]
-    )
-
-    res.json(posts.rows)
+    if(antiSQLi(search) === false || antiCSS(search) === false){
+      console.log("SQL/CSS Injected Query: " + search);
+      console.log("Returning Blanked Results")
+      res.json([{"post_id": "SQL/CSS Injected", "post_title": "Please Try Again", "post_body": "", "username": ""}])
+    } else {
+      const posts = await pool.query(
+        "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE post_title ILIKE $1 AND is_private = FALSE",
+        [`%${search}%`]
+      )
+      //console.log(posts.rows)
+      res.json(posts.rows)
+    }
   } catch (error) {
     console.error(error.message)
   }
