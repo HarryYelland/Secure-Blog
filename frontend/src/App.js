@@ -5,7 +5,6 @@ import AddPost from "./components/AddPost";
 import AddUser from "./components/Register";
 import ViewPosts from "./components/ViewPosts";
 import Login from "./components/Login";
-//import TestPosts from "./components/TestPosts";
 import TwoFactorCheck from "./components/TwoFactorCheck";
 import MyPosts from "./components/MyPosts";
 import ViewPost from "./components/ViewPost";
@@ -24,17 +23,14 @@ export default function App() {
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<AddUser />} />
           <Route path="/2FA" element={<TwoFactorCheck />} />
-          <Route path="/search" element={<SearchPosts/>} />
-          <Route path="/view-all" element={<ViewPosts />} />
 
           <Route element={<PrivateRoutes/>}>
-            <Route path="/post" element={<AddPost />} />
-            
-            <Route path="/view" element={<ViewPost/>} />
-            
-            <Route path="/my-posts" element={<MyPosts />} />
+          <Route path="/search" element={<SearchPosts/>} />
+          <Route path="/view-all" element={<ViewPosts />} />
+          <Route path="/post" element={<AddPost />} />            
+          <Route path="/view" element={<ViewPost/>} />
+          <Route path="/my-posts" element={<MyPosts />} />
           </Route>
-          
         </Routes>
       </BrowserRouter>
       <div className="disclaimer">

@@ -487,7 +487,7 @@ app.post("/check-session", (req, res) => {
 );
 
 
-app.post("/add-post", (req, res) => {
+app.post("/add-post", async(req, res) => {
   if(antiSQLi(req.body.postTitle) == false ||
     antiSQLi(req.body.postText) == false    
   ){
@@ -502,10 +502,20 @@ app.post("/add-post", (req, res) => {
     return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
   }
 
-  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 4, FALSE)");
-  console.log("Post added!");
-  res.send("Post added!");
-  return res;
+  var user_id = findSession(req.body.session)
+
+  try {
+    const post = await pool.query(
+      "INSERT INTO posts (post_title, post_body, author, is_private) VALUES ($1, $2, $3, %4)",
+      [`${req.body.postTitle}`, `${req.body.postText}`, `${user_id}`, `${req.body.private}`]
+    )
+
+    res.json(post.rows)
+  } catch (error) {
+    
+  }
+
+  
 });
 
 
