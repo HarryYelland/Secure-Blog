@@ -12,6 +12,7 @@ import ViewPost from "./components/ViewPost";
 import PrivateRoutes from "./PrivateRoute";
 import SearchPosts from "./components/SearchPosts";
 
+
 export default function App() {
 
   return (

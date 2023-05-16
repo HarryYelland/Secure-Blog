@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
+import './style.css';
 //import { ReCAPTCHA } from "react-google-recaptcha";
 
 var bot = true;
@@ -26,6 +27,10 @@ function verify(){
 function AddPost() {  
   return (
     <div>
+        <a href="/post">Make a post</a>
+        <a href="/view-all">View all posts</a>
+        <a href="/search">Search Posts</a>
+        <a href="/my-posts">My Posts</a>
       <h2>New post!</h2>
       <form>
         <label for="postTitle">Make a title!</label><br/>
