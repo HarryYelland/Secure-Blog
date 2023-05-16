@@ -530,25 +530,17 @@ app.get('/search-posts', async function(req, res) {
   } catch (error) {
     console.error(error.message)
   }
-  
-  //pool.connect(function(err, db, done) {//})
+
 })
 
-app.get('/all-posts', function(request, response) {
-  pool.connect(function(err, db, done) {
-    if(err) {
-      return response.status(400).send(err)
-    } else {
-      db.query('SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE is_private = FALSE ORDER BY post_id DESC', function(err, table) {
-        done();
-        if(err){
-          return response.status(400).send(err);
-        } else {
-          return response.status(200).send(table.rows)
-        }
-      })
-    }
-  })
+app.get('/all-posts', async function(req, res) {
+  try {
+    const posts = await pool.query(
+      "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE is_private = FALSE")
+    res.json(posts.rows)
+  } catch (error) {
+    console.error(error.message)
+  }
 })
 
 app.get('/post', function(request, response) {
