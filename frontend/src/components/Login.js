@@ -3,10 +3,10 @@ import Axios from "axios";
 
 // Function to login user
 const submit = () => {
-  Axios.get("http://localhost:3001/log-use", {
+  Axios.get("http://localhost:3001/login-user", {
   }).then((response) => {
-    alert(response.status);
-  })
+    alert("TEST");
+  });
   
 };
 

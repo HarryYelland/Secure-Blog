@@ -450,7 +450,7 @@ app.post("/add-user", (req, res) => {
 
   //console.log("User added!");
   //res.send("User added!");
-  //return res;
+  return res;
 });
 
 app.post("/check-session", (req, res) => {
@@ -544,7 +544,7 @@ app.get('/my-posts', function(request, response) {
 
 app.get('/login-user', function(request, response){
   //SQLi prevention
-/*  if(antiSQLi(require.body.username) == false,
+  if(antiSQLi(require.body.username) == false,
     antiSQLi(require.body.password) == false
   ){
     console.log("SQL Injection detected");
@@ -557,14 +557,11 @@ app.get('/login-user', function(request, response){
   ){
     console.log("Cross Site Scripting Detected");
     return response.status(400).send("CROSS SITE SCRIPTING DETECTED");
-  }*/
+  }
 
-  alert("SUCCESSFUL");
-
-/*  pool.connect(function(err, db, done){
+  pool.connect(function(err, db, done){
     if(err) throw err;
-    var username = request.body.username
-    var sql = "UPDATE users SET two_fa = gen2fa() WHERE username = " + request.body.username + "";
+    const sql = "UPDATE users SET two_fa = gen2fa() WHERE username = " + request.body.username + "";
 
     db.query(sql, function(err, result){
       if(err) throw err;
@@ -575,14 +572,8 @@ app.get('/login-user', function(request, response){
     let twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
     sendEmail(email, twofa)
     response.send("The details are:" + email + twofa);
-    return response;
-  });*/
+  })
 });
-
-app.get('/log-use', function (request, response){
-  alert("success");
-    });
-
 
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
 
