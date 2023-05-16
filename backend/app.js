@@ -264,37 +264,56 @@ const illegalPhrases2 = [
   "<OBJECT"
 ];
 
+// Function for checking if SQL has been injected into user input
 function antiSQLi(input) {
+  //converts the input to uppercase to limit test cases
   var inputUpper = input.toUpperCase();
+  // create a variable to measure if clean input
   var clean = true;
+  //loop through all the illegal phrases (SQL keywords) to check if any phrases used in input
   for(let i=0, len=illegalPhrases.length; i<len; i++) {
-    //https://www.stackhawk.com/blog/node-js-sql-injection-guide-examples-and-prevention/
     // checks that input is a string and not object etc.
     if(typeof input != "string"){
+      // if its not a string, set clean to false so that it isn't processed
       clean = false;
     }
-
+    // if an illegal phrase is found
     if (inputUpper.includes(illegalPhrases[i])) {
+      // set clean to false so that it isn't processed
       clean = false;
+      // output to console that sql injection has been found
+      // also output the query so that any system admins can use this for insights as part of sqli prevention methods/monitoring
       console.log("SQL injection on " + input);
     }
   }
+  // return the cleanliness rating (if true okay to process, if false reject and do not process)
   return clean;
 }
 
+//Function to check if cross-site scripting has been injected into input
 function antiCSS(input) {
+    //converts the input to uppercase to limit test cases
   var inputUpper = input.toUpperCase();
+  // create a variable to measure if clean input
   var clean = true;
+  //loop through all the illegal phrases (scripting tags/phrases) to check if any phrases used in input
   for(let i=0, len=illegalPhrases2.length; i<len; i++) {
+    // checks that input is a string and not object etc.
     if(typeof input != "string"){
+      // if its not a string, set clean to false so that it isn't processed
       clean = false;
     }
 
+    // if an illegal phrase is found
     if (inputUpper.includes(illegalPhrases2[i])) {
+      // set clean to false so that it isn't processed
       clean = false;
+      // output to console that cross-site scripting has been found
+      // also output the script to the console so that any system admins can use this for insights as part of css prevention methods/monitoring
       console.log("Cross-Site Scripting on " + input);
     }
   }
+  // return the cleanliness rating (if true okay to process, if false reject and do not process)
   return clean;
 }
 
@@ -490,23 +509,21 @@ app.post("/add-post", (req, res) => {
 });
 
 
-app.get('/search-posts', function(request, response) {
-  console.log("called search posts")
-  console.log(req.body.search)
-  pool.connect(function(err, db, done) {
-    if(err) {
-      return response.status(400).send(err)
-    } else {
-      db.query("SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE is_private = FALSE AND post_title LIKE '" + req.body.title + "' ORDER BY post_id DESC", function(err, table) {
-        done();
-        if(err){
-          return response.status(400).send(err);
-        } else {
-          return response.status(200).send(table.rows)
-        }
-      })
-    }
-  })
+app.get('/search-posts', async function(req, res) {
+  try {
+    const { search } = req.query;
+
+    const posts = await pool.query(
+      "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE post_title ILIKE $1 AND is_private = FALSE",
+      [`%${search}%`]
+    )
+
+    res.json(posts.rows)
+  } catch (error) {
+    console.error(error.message)
+  }
+  
+  //pool.connect(function(err, db, done) {//})
 })
 
 app.get('/all-posts', function(request, response) {
