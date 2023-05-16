@@ -1,34 +1,49 @@
-import { useState, useEffect } from "react";
-import Axios from "axios";
+import React, {Fragment, useState, useEffect} from 'react';
+import './style.css';
 
-// Function to login user
-const submit = () => {
-  Axios.get("http://localhost:3001/login-user", {
-  }).then((response) => {
-    alert("TEST");
-  });
-  
-};
+function Login() {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [response, setResponse] = useState("")
+    
+    const onSubmitForm = async (e) => {
+      e.preventDefault();
+      try {
+        const rawResponse = await fetch(`http://localhost:3001/login-user/?user=${username}&pass=${password}`);
+        const parseResponse = await rawResponse.json();
 
-// Main function for adding a product to a sales order page
-function Login() {  
-  return (
-    <div>
-      <h2>Login</h2>
-      <form>
-        <label for="username">Username</label><br/>
-        <input type="text" id="username"/><br/>
-        <br/>
-        <label for="password" placeholder="Password">Password</label><br/>
-        <input id="password" placeholder="Password" type="password"></input>
-        <br/>
-        <button type="submit" id="userSubmit" onClick={submit}>Login</button>
-    </form>
-    <h3>New User?</h3>
-    <a href="/register">Register Here!</a><br/>
-      <a href="/SearchPosts">Add a post!</a>
-  </div>
-  );
+        //console.log(parseResponse);
+        setResponse(parseResponse.message);
+        await sessionStorage.setItem("session", parseResponse.session);
+        window.location.href="/2FA";
+      } catch (error) {
+        console.error(error.message)
+      }
+    }
+
+    return (
+      <Fragment>
+        <h2>Login</h2>
+        <h3>{response}</h3>
+        <div className='container'>
+          <form onSubmit={onSubmitForm}>
+            <input type="text" name="username"
+            placeholder="Username"
+            className='username'
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            />
+            <input type="text" name="password"
+            placeholder="password"
+            className='password'
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            />
+            <button className="btn">Submit</button>
+          </form>
+          <br/>
+        </div>
+      </Fragment>
+    )   
 }
-
 export default Login;

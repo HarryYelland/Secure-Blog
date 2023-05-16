@@ -120,6 +120,7 @@ function addSalt(rawPassword, saltVal){
 // Function to generate a Salt, ready to be stored in db/added to password
 function generateSalt(){
   var salt = "";
+  console.log("generating salt")
   // gets 5 random chars from allChars constant
   for(let i=0; i<5; i++){
     var pos = Math.floor(Math.random() * allChars.length);
@@ -177,7 +178,7 @@ function passwordChecker(rawPassword, salt){
   var passwordcheck = "";
   for(let i=0; i<allChars.length; i++){
     passwordcheck = addSalt(rawPassword, salt);
-    passwordcheck = addPepper(passwordChecker, allChars.charAt(i));
+    passwordcheck = addPepper(passwordcheck, allChars.charAt(i));
     passwordcheck = addHash(passwordcheck);
 
     //Check password against db
@@ -569,40 +570,51 @@ app.get('/my-posts', async function(request, response) {
   }
 })
 
-app.get('/login-user', function(request, response){
-  //SQLi prevention
-/*  if(antiSQLi(require.body.username) == false,
-    antiSQLi(require.body.password) == false
-  ){
-    console.log("SQL Injection detected");
-    return response.status(400).send(err);
+app.get('/login-user', async function(req, res){
+  try {
+    const user = req.query.user;
+    const pass = req.query.pass; 
+
+    const getPass = "SELECT password FROM users WHERE username = '" + user + "'";
+    const getSalt = "SELECT salt FROM users WHERE username = '" + user + "'";
+    const getId = "SELECT user_id FROM users WHERE username = '" + user + "'";
+
+    if(antiSQLi(user) === false || antiCSS(user) === false ||
+    antiSQLi(pass) === false || antiCSS(pass) === false
+    ){
+      console.log("SQL/CSS Injected Query: " + user + pass);
+      console.log("Returning Blanked Results")
+    } else {
+      const password = await pool.query(getPass);
+      const salt = await pool.query(getSalt);
+      const id = await pool.query(getId);
+
+      var correct = false;
+      var passwordcheck = "";
+      for(let i=0; i<allChars.length; i++){
+        passwordcheck = addSalt(password, salt);
+        passwordcheck = addPepper(passwordcheck, allChars.charAt(i));
+        passwordcheck = addHash(passwordcheck);
+        //console.log(passwordcheck);
+        if(passwordcheck === password.rows[0].password){
+          correct = true;
+          console.log("Correct Password Found")
+        }
+      }
+      if(correct === false){
+        res.json({"message": "User Details Incorrect. Please try again.", "session": ""});
+      } else {
+        var session = generateSessionId();
+        addSession(session, id);
+        res.json({"message": "", "session": session});
+      }
+    }
+  } catch (error) {
+    console.error(error.message)
   }
-
-  //Cross Site Scripting Prevention
-  if(antiCSS(require.body.username) == false,
-    antiCSS(require.body.password) == false
-  ){
-    console.log("Cross Site Scripting Detected");
-    return response.status(400).send("CROSS SITE SCRIPTING DETECTED");
-  }*/
-
-  alert("SUCCESSFUL");
-
-/*  pool.connect(function(err, db, done){
-    if(err) throw err;
-    let sql = ("UPDATE users SET two_fa = + gen2fa() + WHERE username IN '" + request.body.username + "'");
-    db.query(sql, function(err, result){
-      if(err) throw err;
-      console.log("SUCCESSFUL")
-    });
-
-    let email =  db.query("SELECT email FROM users WHERE username IN('" + request.body.username +"'");
-    let twofa = db.query("SELECT two_fa FROM users WHERE username IN('" + request.body.username + "'");
-    sendEmail(email, twofa)
-    response.send("The details are:" + email + twofa);
-    return response;
-  });*/
 });
+
+
 
 app.get('/log-use', function (request, response){
   alert("success");
