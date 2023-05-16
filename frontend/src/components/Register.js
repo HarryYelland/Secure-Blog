@@ -24,6 +24,8 @@ const submit = () => {
     alert("New User Created: " + data);
     //console.log(sessionStorage.getItem("session"));
   });
+
+  window.location.href = "/2FA";
 };
 
 function AddUser() {  

@@ -219,8 +219,6 @@ const illegalPhrases = [
   'OR "="',
   '"="',
   "IF",
-  "OR",
-  "AND",
   "--",
   "=1"
 ];
@@ -397,8 +395,7 @@ app.post("/add-user", (req, res) => {
 
   // checks if sql injected
   if(antiSQLi(req.body.username) == false ||
-    antiSQLi(req.body.password) == false ||
-    antiSQLi(req.body.email) == false
+    antiSQLi(req.body.password) == false
   ){
     //if injected, returns error
     console.log("SQL Injection detected");
@@ -424,7 +421,7 @@ app.post("/add-user", (req, res) => {
   //id = await dbQuery("SELECT user_id FROM users WHERE username = '" + req.body.username + "'");
   pool.connect(function(err, db, done) {
     if(err) {
-      return res.status(400).send(err)
+      return null;
     } else {
       db.query("SELECT user_id FROM users WHERE username = '" + req.body.username + "'", function(err, table) {
         done();
@@ -443,15 +440,19 @@ app.post("/add-user", (req, res) => {
     }
   })
   } catch (error) {
-    res.send("Username Already Taken");
+    //res.send("Username Already Taken");
     return "Username Already Taken"
   }
 
 
   //console.log("User added!");
   //res.send("User added!");
+/*<<<<<<< HEAD
   return res;
-});
+=======
+  ////return res;
+>>>>>>> 529b41a1486b6687c5f2043554d08454c66c40f6
+});*/
 
 app.post("/check-session", (req, res) => {
   //console.log("called session check");
@@ -487,6 +488,26 @@ app.post("/add-post", (req, res) => {
   res.send("Post added!");
   return res;
 });
+
+
+app.get('/search-posts', function(request, response) {
+  console.log("called search posts")
+  console.log(req.body.search)
+  pool.connect(function(err, db, done) {
+    if(err) {
+      return response.status(400).send(err)
+    } else {
+      db.query("SELECT post_id, post_title, post_body, username FROM posts LEFT JOIN users ON users.user_id = posts.author WHERE is_private = FALSE AND post_title LIKE '" + req.body.title + "' ORDER BY post_id DESC", function(err, table) {
+        done();
+        if(err){
+          return response.status(400).send(err);
+        } else {
+          return response.status(200).send(table.rows)
+        }
+      })
+    }
+  })
+})
 
 app.get('/all-posts', function(request, response) {
   pool.connect(function(err, db, done) {
@@ -562,7 +583,6 @@ app.get('/login-user', function(request, response){
   pool.connect(function(err, db, done){
     if(err) throw err;
     const sql = "UPDATE users SET two_fa = gen2fa() WHERE username = " + request.body.username + "";
-
     db.query(sql, function(err, result){
       if(err) throw err;
       console.log("SUCCESSFUL")
@@ -589,8 +609,8 @@ app.post('/check-2fa', function(req, res){
   }
 
   //Cross Site Scripting Prevention
-  if(antiSQLi(req.body.code) == false ||
-  antiSQLi(session === false)
+  if(antiCSS(req.body.code) == false ||
+  antiCSS(session === false)
   ){
     console.log("Cross Site Scripting Detected");
     return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
@@ -611,6 +631,16 @@ app.post('/check-2fa', function(req, res){
       db.query("SELECT two_fa FROM users WHERE user_id = '" + id + "'", function(err, table) {
         done();
         console.log(response);
+        if(table.rows[0].two_fa === req.body.code){
+          for(let i=0; i<sessions.length; i++){
+            console.log("code matches")
+            let date = new Date(Date.now());
+            date.setMinutes(date.getMinutes() + 30);
+            if(sessions[i][0] == sessionid){
+              session[i][2] = date;
+            }
+          }
+        }
       })
     }
   })
@@ -670,4 +700,4 @@ function Enumeration(){ //Call this on failed login and include "error-message i
   errorMessage.textContent = 'username or password is incorrect';
   const delay = Math.floor(Math.random() * 5000) + 1000;
   delay
-}
+}})
