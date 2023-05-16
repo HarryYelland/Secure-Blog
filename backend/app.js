@@ -501,8 +501,10 @@ app.post("/add-post", (req, res) => {
     console.log("Cross Site Scripting Detected");
     return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
   }
+  const title = req.body.postTitle;
+  const text = req.body.postText;
 
-  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 4, FALSE)");
+  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES (?, ?, 4, FALSE)", [title, text]);
   console.log("Post added!");
   res.send("Post added!");
   return res;
@@ -510,9 +512,8 @@ app.post("/add-post", (req, res) => {
 
 
 app.post("/delete-post", (req, res) => {
-  dbQuery("DELETE FROM posts WHERE post_title = 'Test_Post'");
+  dbQuery("DELETE FROM posts WHERE post_title = '"+ req.body.post_id +"'");
   res.send("Post deleted");
-  
   return res;
 });
 
