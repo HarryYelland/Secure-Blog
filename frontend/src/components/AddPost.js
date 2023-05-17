@@ -36,7 +36,7 @@ function AddPost() {
         <textarea id="postText" placeholder="Type anything here! (within reason lol)" cols="40" rows="10"></textarea>
         <br/>
           <label for="private1">Private post</label>
-          <input type="radio" id="private1" name="privacyval" value="private"></input><br/>
+          <input type="radio" id="private1" name="privacyval" value="private" required></input><br/>
           <label htmlFor="private2">Public post</label>
           <input type="radio" id="private2" name="privacyval" value="notprivate"></input><br/>
         <button type="submit" id="postSubmit" onClick={submit}>Submit</button>
