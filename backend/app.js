@@ -94,6 +94,7 @@ function generateSessionId(){
 }
 
 app.post("/check-session", (req, res) => {
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   var newSession = req.body.session;
   if(getSession(newSession) === true){
     //console.log("returning true")
@@ -389,6 +390,7 @@ function dbQuery(query) {
 }
 
 app.get('/2FA', async function(req,res){
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   try {
     //console.log("starting 2fa gen")
     const session = req.query.session;
@@ -412,6 +414,7 @@ app.get('/2FA', async function(req,res){
 })
 
 app.get('/add-user', async function(req, res){
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   try {
     const user = req.query.user;
     const pass = req.query.pass; 
@@ -452,6 +455,7 @@ app.get('/add-user', async function(req, res){
 
 
 app.post("/add-post", (req, res) => {
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   if(antiSQLi(req.body.postTitle) == false ||
     antiSQLi(req.body.postText) == false    
   ){
@@ -483,6 +487,7 @@ app.post("/add-post", (req, res) => {
 
 
 app.get('/search-posts', async function(req, res) {
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   try {
     const { search } = req.query;
 
@@ -504,6 +509,7 @@ app.get('/search-posts', async function(req, res) {
 })
 
 app.get('/all-posts', async function(req, res) {
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   try {
     const posts = await pool.query(
       "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE is_private = FALSE")
@@ -514,6 +520,7 @@ app.get('/all-posts', async function(req, res) {
 })
 
 app.get('/post', function(request, response) {
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   pool.connect(function(err, db, done) {
     if(err) {
       return response.status(400).send(err);
@@ -531,6 +538,7 @@ app.get('/post', function(request, response) {
 })
 
 app.get('/my-posts', async function(request, response) {
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   try {
     const { session } = req.query;
     const userid = findSession(session)
@@ -547,6 +555,7 @@ app.get('/my-posts', async function(request, response) {
 })
 
 app.get('/login-user', async function(req, res){
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   try {
     const user = req.query.user;
     const pass = req.query.pass; 
@@ -583,14 +592,8 @@ app.get('/login-user', async function(req, res){
 
 
 
-app.get('/log-use', function (request, response){
-  alert("success");
-    });
-
-
-//sendEmail("kingaj4ever@gmail.com", gen2fa());
-
 app.get('/check-2fa', async function(req, res){
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
   var session = req.query.session;
   var code = req.query.code;
   var id = -1;

@@ -39,19 +39,19 @@ function Register() {
             value={username}
             onChange={e => setUsername(e.target.value)}
             />
-            <input type="text" name="email"
+            <input type="email" name="email"
             placeholder="Email"
             className='email'
             value={email}
             onChange={e => setEmail(e.target.value)}
             />
-            <input type="text" name="password"
+            <input type="password" name="password"
             placeholder="Password"
             className='password'
             value={password}
             onChange={e => setPassword(e.target.value)}
             />
-            <input type="text" name="confirmPassword"
+            <input type="password" name="confirmPassword"
             placeholder="Confirm Password"
             className='confirmPassword'
             value={confirmPassword}
