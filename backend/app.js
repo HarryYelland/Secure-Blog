@@ -455,7 +455,7 @@ app.get('/add-user', async function(req, res){
 
 
 app.post("/add-post", (req, res) => {
-  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000');
   if(antiSQLi(req.body.postTitle) == false ||
     antiSQLi(req.body.postText) == false    
   ){
