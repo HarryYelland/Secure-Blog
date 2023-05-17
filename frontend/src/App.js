@@ -23,14 +23,14 @@ export default function App() {
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<AddUser />} />
           <Route path="/2FA" element={<TwoFactorCheck />} />
-          <Route path="/search" element={<SearchPosts/>} />
-          <Route path="/view-all" element={<ViewPosts />} />
-          <Route path="/post" element={<AddPost />} />            
-          <Route path="/view" element={<ViewPost/>} />
-          <Route path="/my-posts" element={<MyPosts />} />
+  
 
           <Route element={<PrivateRoutes/>}>
-
+            <Route path="/search" element={<SearchPosts/>} />
+            <Route path="/view-all" element={<ViewPosts />} />
+            <Route path="/post" element={<AddPost />} />            
+            <Route path="/view" element={<ViewPost/>} />
+            <Route path="/my-posts" element={<MyPosts />} />
           </Route>
         </Routes>
       </BrowserRouter>

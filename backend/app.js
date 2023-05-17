@@ -43,7 +43,7 @@ function addSession(sessionid, userid){
 
 
 function getSession(sessionid){
-  console.log("checking session " + sessionid + " against " + sessions[0][0]);
+  //console.log("checking session " + sessionid + " against " + sessions[0][0]);
   let date = new Date(Date.now());
   for(let i=0; i<sessions.length; i++){
     if(sessions[i][0] == sessionid){
@@ -58,6 +58,17 @@ function getSession(sessionid){
     }
   }
   return false;
+}
+
+function finduserid(session){
+  for(let i=0; i<sessions.length; i++){
+    console.log("session" + session)
+    console.log("in array" + sessions[i][0])
+    if(sessions[i][0] === session){
+      return sessions[i][1];
+    }
+  }
+  return -1;
 }
 
 function findSession(userid){
@@ -85,7 +96,7 @@ function generateSessionId(){
 app.post("/check-session", (req, res) => {
   var newSession = req.body.session;
   if(getSession(newSession) === true){
-    console.log("returning true")
+    //console.log("returning true")
     res.send(true);
     return res;
   } else if (getSession(newSession) === "auth"){
@@ -174,29 +185,18 @@ function passwordGenerator(rawPassword, salt){
   return improvedPassword;
 }
 
-function passwordChecker(rawPassword, salt){
+function passwordChecker(rawPassword, salt, correctPass){
   var passwordcheck = "";
   for(let i=0; i<allChars.length; i++){
     passwordcheck = addSalt(rawPassword, salt);
     passwordcheck = addPepper(passwordcheck, allChars.charAt(i));
     passwordcheck = addHash(passwordcheck);
 
-    //Check password against db
-    pool.connect(function(err, db, done) {
-      if(err) {
-        return response.status(400).send(err)
-      } else {
-        db.query("SELECT username FROM users WHERE password = '" + passwordcheck + "'", function(err, table) {
-          done();
-          if(err){
-            return response.status(400).send(err);
-          } else {
-            return response.status(200).send(table.rows)
-          }
-        })
-      }
-    })  
+    if(rawPassword === correctPass){
+      return true;
+    }
   }
+  return false;
 }
 
 //SQLi Banned Phrases
@@ -388,24 +388,27 @@ function dbQuery(query) {
 
 }
 
-app.post("/duplicate-user", (req, res) => {
-  //checks to see if username already taken
-  pool.connect(function(err, db, done) {
-    if(err) {
-      return res.status(400).send(err)
-    } else {
-      db.query("SELECT username FROM users WHERE username = '" + req.body.username + "'", function(err, table) {
-        done();
-        if(err){
-          return res.status(400).send(err);
-        } else {
-          res.send("User already exists")
-          return res.status(400).send("User already exists");
-        }
-      })
-    }
-  })
-  return "Creating User";
+app.get('/2FA', async function(req,res){
+  try {
+    //console.log("starting 2fa gen")
+    const session = req.query.session;
+    //console.log("session!" + session)
+    const getId = await finduserid(session);
+    const two_fa = await gen2fa();
+    //console.log("Generated Code: " + two_fa);
+    //console.log(sessions)
+    const twoFA = "UPDATE users SET two_fa = " + two_fa + " WHERE user_id = " + getId;
+    const set2FA = await pool.query(twoFA);
+    const email = "SELECT email FROM users WHERE user_id = " + getId;
+    const getEmail = await pool.query(email);
+    //console.log("userid = "+ getId);
+    //console.log("email" + getEmail.rows[0].email);
+    await sendEmail(getEmail.rows[0].email, two_fa);
+    //console.log("Email Sent")
+    res.json({"message": "Code Sent"});
+  } catch (error) {
+    res.json({"message": "Error generating code, contact server admin"})
+  }
 })
 
 app.get('/add-user', async function(req, res){
@@ -429,30 +432,23 @@ app.get('/add-user', async function(req, res){
       console.log("Returning Blanked Results")
       res.json({"message": "SQL Keywords/CSS injected, please try changing your details", "session": ""});
     } else {
-      const insert = await pool.query(setReg);
-      const id = await pool.query(getId);
-      addSession(session, id);
-      console.log("Sessions")
-      console.log(sessions)
-      res.json({"message": "", "session": session});
+      const dupes = await pool.query(getId);
+      if(dupes.length > 0){
+        res.json({"message": "Username Already Taken", "session": ""});
+      } else{
+        const insert = await pool.query(setReg);
+        const id = await pool.query(getId);
+        await addSession(session, id.rows[0].user_id);
+        //console.log("Sessions");
+        //console.log(sessions);
+        res.json({"message": "", "session": session});
+      }
     }
   } catch (error) {
     console.error(error.message)
   }
 });
 
-app.post("/check-session", (req, res) => {
-  //console.log("called session check");
-  //console.log("sessionid = " + req.body.session);
-  if(req.body.session === "1"){
-    console.log("returning true")
-    res.send(true);
-    return res;
-  }
-  res.send(false);
-  return res;
-}
-);
 
 
 app.post("/add-post", (req, res) => {
@@ -558,6 +554,7 @@ app.get('/login-user', async function(req, res){
     const getPass = "SELECT password FROM users WHERE username = '" + user + "'";
     const getSalt = "SELECT salt FROM users WHERE username = '" + user + "'";
     const getId = "SELECT user_id FROM users WHERE username = '" + user + "'";
+    const getEmail = "SELECT email FROM users WHERE user_id = " + getId;
 
     if(antiSQLi(user) === false || antiCSS(user) === false ||
     antiSQLi(pass) === false || antiCSS(pass) === false
@@ -570,22 +567,13 @@ app.get('/login-user', async function(req, res){
       const id = await pool.query(getId);
 
       var correct = false;
-      var passwordcheck = "";
-      for(let i=0; i<allChars.length; i++){
-        passwordcheck = addSalt(password, salt);
-        passwordcheck = addPepper(passwordcheck, allChars.charAt(i));
-        passwordcheck = addHash(passwordcheck);
-        //console.log(passwordcheck);
-        if(passwordcheck === password.rows[0].password){
-          correct = true;
-          console.log("Correct Password Found")
-        }
-      }
+      correct = await passwordChecker()
+
       if(correct === false){
         res.json({"message": "User Details Incorrect. Please try again.", "session": ""});
       } else {
-        var session = generateSessionId();
-        addSession(session, id);
+        var session = await generateSessionId();
+        await addSession(session, id);
         res.json({"message": "", "session": session});
       }
     }
@@ -603,55 +591,44 @@ app.get('/log-use', function (request, response){
 
 //sendEmail("kingaj4ever@gmail.com", gen2fa());
 
-app.post('/check-2fa', function(req, res){
-  var session = req.body.session;
+app.get('/check-2fa', async function(req, res){
+  var session = req.query.session;
+  var code = req.query.code;
   var id = -1;
-  //SQLi prevention
-  if(antiSQLi(req.body.code) === false ||
-  antiSQLi(session === false)
-  ){
-    console.log("SQL Injection detected");
-    return res.status(400).send(err);
-  }
-
-  //Cross Site Scripting Prevention
-  if(antiCSS(req.body.code) == false ||
-  antiCSS(session === false)
-  ){
-    console.log("Cross Site Scripting Detected");
-    return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
-  }
-
+ 
   for(let i=0; i<sessions.length; i++){
-    if(sessions[i][0] == sessionid){
+    if(sessions[i][0] === session.toString()){
       // found a match
-      //console.log(session[i][2]);
-      id = session[i][1];
+      id = sessions[i][1];
     }
   }
+  console.log("id: " + id);
 
-  pool.connect(function(err, db, done) {
-    if(err) {
-      return response.status(400).send(err)
-    } else {
-      db.query("SELECT two_fa FROM users WHERE user_id = '" + id + "'", function(err, table) {
-        done();
-        console.log(response);
-        if(table.rows[0].two_fa === req.body.code){
-          for(let i=0; i<sessions.length; i++){
-            console.log("code matches")
-            let date = new Date(Date.now());
-            date.setMinutes(date.getMinutes() + 30);
-            if(sessions[i][0] == sessionid){
-              session[i][2] = date;
-            }
-          }
+  const twofa = "SELECT two_fa FROM users WHERE user_id = " + id;
+  const get_twofa = await pool.query(twofa);
+  
+  try {
+    console.log("correct code: " + get_twofa.rows[0].two_fa);
+    console.log("supplied code: " + code.toString());
+    if(get_twofa.rows[0].two_fa.toString() === code.toString()){
+      for(let i=0; i<sessions.length; i++){
+        if(sessions[i][0].toString() === sessionid.toString()){
+          console.log("code matches")
+          console.log(sessions)
+          let date = new Date(Date.now());
+          await date.setMinutes(date.getMinutes() + 30);
+          sessions[i][2] = date;
+          console.log(sessions)
         }
-      })
+        await res.json({"message": "Code Matches"})
+      }
+    } else {
+      await res.json({"message": "Error with code entered"})
     }
-  })
-
-
+  } catch (error) {
+    await res.json({"message": "Error with code entered"})
+  }
+  
 })
 
 app.listen(PORT, () => {

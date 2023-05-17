@@ -14,8 +14,8 @@ function Login() {
 
         //console.log(parseResponse);
         setResponse(parseResponse.message);
-        await sessionStorage.setItem("session", parseResponse.session);
-        if(sessionStorage.getItem("session") !== ""){
+        await window.sessionStorage.setItem("session", parseResponse.session);
+        if(window.sessionStorage.getItem("session") !== ""){
           window.location.href="/2FA";
         }
       } catch (error) {
