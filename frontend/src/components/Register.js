@@ -1,55 +1,68 @@
-import { useState, useEffect } from "react";
-import Axios from "axios";
+import React, {Fragment, useState, useEffect} from 'react';
+import './style.css';
 
-const submit = () => {
-  if(document.getElementById("password").value !== document.getElementById("confirmPassword").value) {
-    alert("Passwords do not match!");
-    return;
-  }
-  alert("Submitting details...");
-  Axios.post("http://localhost:3001/duplicate-user", {
-    username: document.getElementById("username").value
-  }).then((response) => {
-    alert(response.status);
-  })
+function Register() {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [response, setResponse] = useState("")
+    
+    const onSubmitForm = async (e) => {
+      e.preventDefault();
+      try {
+        if(password === confirmPassword){
+          const rawResponse = await fetch(`http://localhost:3001/add-user/?user=${username}&pass=${password}&email=${email}`);
+          const parseResponse = await rawResponse.json();
+  
+          //console.log(parseResponse);
+          setResponse(parseResponse.message);
+          await sessionStorage.setItem("session", parseResponse.session);
+          if(sessionStorage.getItem("session") !== ""){
+            window.location.href="/2FA";
+          }
+        }
+      } catch (error) {
+        console.error(error.message)
+      }
+    }
 
-  Axios.post("http://localhost:3001/add-user", {
-    username: document.getElementById("username").value,
-    password: document.getElementById("password").value,
-    email: document.getElementById("email").value,
-  }).then((response) => {
-    var data = response;
-    sessionStorage.setItem("session", data.data);
-    console.log(data.data);
-    alert("New User Created: " + data);
-    //console.log(sessionStorage.getItem("session"));
-  });
-
-  window.location.href = "/2FA";
-};
-
-function AddUser() {  
-  return (
-    <div>
-      <h2>Register New Account</h2>
-      <form>
-        <label for="username">Username</label><br/>
-        <input type="text" id="username"/><br/>
-        <br/>
-        <label for="email">Email</label><br/>
-        <input type="email" id="email"/><br/>
-        <br/>
-        <label for="password" placeholder="Password">Password</label><br/>
-        <input id="password" placeholder="Password" type="password"></input>
-        <br/>
-        <label for="confirmPassword" placeholder="Confirm Password">Confirm Password</label><br/>
-        <input id="confirmPassword" placeholder="Re-type Password" type="password"></input>
-        <button type="submit" id="userSubmit" onClick={submit}>Submit</button>
-    </form>
-    <h3>Already have an account?</h3>
-    <a href="/">Login Here!</a>
-  </div>
-  );
+    return (
+      <Fragment>
+        <h2>Login</h2>
+        <h3>{response}</h3>
+        <div className='container'>
+          <form onSubmit={onSubmitForm}>
+            <input type="text" name="username"
+            placeholder="Username"
+            className='username'
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            />
+            <input type="text" name="email"
+            placeholder="Email"
+            className='email'
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            />
+            <input type="text" name="password"
+            placeholder="Password"
+            className='password'
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            />
+            <input type="text" name="confirmPassword"
+            placeholder="Confirm Password"
+            className='confirmPassword'
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            />
+            <button className="btn">Submit</button>
+          </form>
+          <br/>
+        </div>
+        <a href="/">Already Have An Account?</a>
+      </Fragment>
+    )   
 }
-
-export default AddUser;
+export default Register;

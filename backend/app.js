@@ -124,9 +124,9 @@ function generateSalt(){
   // gets 5 random chars from allChars constant
   for(let i=0; i<5; i++){
     var pos = Math.floor(Math.random() * allChars.length);
-    console.log(pos);
+    //console.log(pos);
     salt += allChars.charAt(pos);
-    console.log(salt);
+    //console.log(salt);
   }
   return salt;
 }
@@ -408,66 +408,37 @@ app.post("/duplicate-user", (req, res) => {
   return "Creating User";
 })
 
-app.post("/add-user", (req, res) => {
-
-  // generates salt for user
-  let salt = generateSalt();
-
-  // checks if sql injected
-  if(antiSQLi(req.body.username) == false ||
-    antiSQLi(req.body.password) == false
-  ){
-    //if injected, returns error
-    console.log("SQL Injection detected");
-    return res.status(400).send("SQL injection detected");
-  }
-
-  // checks if cross site scripting injected
-  if(antiCSS(req.body.username) == false ||
-    antiCSS(req.body.email) == false
-  ){
-    //if injected, returns error
-    console.log("Cross Site Scripting Detected");
-    return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
-  }
-
-  // inserts new user into db
+app.get('/add-user', async function(req, res){
   try {
-    dbQuery("INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('"
-  + req.body.username + "', '" + passwordGenerator(req.body.password, salt) + "', '" + req.body.email + "', '" + generateSessionId() + "', '" + gen2fa() + "', '" + salt + "')");
-  console.log("getting id");
+    const user = req.query.user;
+    const pass = req.query.pass; 
+    const email = req.query.email;
+    const salt = await generateSalt();
+    const password = await passwordGenerator(pass, salt);
+    const session = await generateSessionId();
+    const twofa = await gen2fa();
 
-  var id = -1;
-  //id = await dbQuery("SELECT user_id FROM users WHERE username = '" + req.body.username + "'");
-  pool.connect(function(err, db, done) {
-    if(err) {
-      return null;
+    const setReg = "INSERT INTO users (username, password, email, session, two_fa, salt) VALUES ('" + user + "', '" + password + "', '" + email + "', '" + session + "', '" + twofa + "', '" + salt + "')";
+    const getId = "SELECT user_id FROM users WHERE username = '" + user + "'";
+
+    if(antiSQLi(user) === false || antiCSS(user) === false ||
+    antiSQLi(pass) === false || antiCSS(pass) === false ||
+    antiSQLi(email) === false || antiCSS(email) === false
+    ){
+      console.log("SQL/CSS Injected Query: " + user + pass + email);
+      console.log("Returning Blanked Results")
+      res.json({"message": "SQL Keywords/CSS injected, please try changing your details", "session": ""});
     } else {
-      db.query("SELECT user_id FROM users WHERE username = '" + req.body.username + "'", function(err, table) {
-        done();
-        if(err){} else {
-          //console.log(table.rows);
-          id = table.rows[0].user_id;
-          addSession(generateSessionId(), id);
-          console.log("sessions");
-          console.log(sessions)
-          var sessionid = findSession(id);
-          console.log("sessionid = " + sessionid);
-          res.send(sessionid);
-          return sessionid;
-        }
-      })
+      const insert = await pool.query(setReg);
+      const id = await pool.query(getId);
+      addSession(session, id);
+      console.log("Sessions")
+      console.log(sessions)
+      res.json({"message": "", "session": session});
     }
-  })
   } catch (error) {
-    //res.send("Username Already Taken");
-    return "Username Already Taken"
+    console.error(error.message)
   }
-
-
-  //console.log("User added!");
-  //res.send("User added!");
-  ////return res;
 });
 
 app.post("/check-session", (req, res) => {

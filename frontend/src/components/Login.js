@@ -15,7 +15,9 @@ function Login() {
         //console.log(parseResponse);
         setResponse(parseResponse.message);
         await sessionStorage.setItem("session", parseResponse.session);
-        window.location.href="/2FA";
+        if(sessionStorage.getItem("session") !== ""){
+          window.location.href="/2FA";
+        }
       } catch (error) {
         console.error(error.message)
       }
@@ -34,7 +36,7 @@ function Login() {
             onChange={e => setUsername(e.target.value)}
             />
             <input type="text" name="password"
-            placeholder="password"
+            placeholder="Password"
             className='password'
             value={password}
             onChange={e => setPassword(e.target.value)}
@@ -43,6 +45,7 @@ function Login() {
           </form>
           <br/>
         </div>
+        <a href="/register">Create an Account</a>
       </Fragment>
     )   
 }
