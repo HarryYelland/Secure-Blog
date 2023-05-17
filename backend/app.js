@@ -470,7 +470,16 @@ app.post("/add-post", (req, res) => {
     return res.status(400).send("CROSS SITE SCRIPTING DETECTED");
   }
 
-  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 4, FALSE)");
+  var privacy = "FALSE"
+  if (req.body.privacy == "private"){
+    console.log("TRUE");
+    privacy = "TRUE"
+  } else {
+    console.log("FALSE")
+    privacy = "FALSE"
+  };
+
+  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 2, '"+privacy+"')");
   console.log("Post added!");
   res.send("Post added!");
   return res;

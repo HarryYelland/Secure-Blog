@@ -6,7 +6,7 @@ const submit =() => {
 function Post() {
     return (
         <div>
-            <h2>New post!</h2>
+            <h2>Make a  New post!</h2>
             <form>
                 <label for="postTitle">Make a title!</label><br/>
                 <input type="text" id="postTitle"/><br/>
