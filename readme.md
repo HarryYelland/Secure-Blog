@@ -22,9 +22,12 @@ For the backend:
   node app.js
 ```
 
+
 ## Authors
 
 - [Harry Yelland](https://github.com/HarryYelland)
 - [Addam Ramos](https://github.com/addam-ramos)
 - [Arron Hodge](https://github.com/SkyManz)
+
+https://trello.com/invite/b/UmYoyfP2/ATTI3ccd86d1834a99d8afe1c80dc62865be84D2F733/dss2022-23-002-ug13
 
