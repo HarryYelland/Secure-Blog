@@ -455,7 +455,7 @@ app.get('/add-user', async function(req, res){
 
 
 app.post("/add-post", (req, res) => {
-  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000');
   if(antiSQLi(req.body.postTitle) == false ||
     antiSQLi(req.body.postText) == false    
   ){
@@ -540,7 +540,7 @@ app.get('/post', function(request, response) {
 
 
 app.post('/delete-post', function (request, response){
-  res.set('Access-Control-Allow-Origin', 'https://localhost:3000');
+  response.set('Access-Control-Allow-Origin', 'https://localhost:3000');
   pool.connect(function(err, db, done){
     if (err){
       return response.status(400).send(err);
