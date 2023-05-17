@@ -23,7 +23,6 @@ export default function App() {
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<AddUser />} />
           <Route path="/2FA" element={<TwoFactorCheck />} />
-  
 
           <Route element={<PrivateRoutes/>}>
             <Route path="/search" element={<SearchPosts/>} />

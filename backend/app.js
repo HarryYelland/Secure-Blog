@@ -537,18 +537,33 @@ app.get('/post', function(request, response) {
   })
 })
 
-app.get('/my-posts', async function(request, response) {
-  res.set('Access-Control-Allow-Origin', 'https://localhost:3000'); 
-  try {
-    const { session } = req.query;
-    const userid = findSession(session)
 
-    const posts = await pool.query(
+
+app.post('/delete-post', function (request, response){
+  res.set('Access-Control-Allow-Origin', 'https://localhost:3000');
+  pool.connect(function(err, db, done){
+    if (err){
+      return response.status(400).send(err);
+    } else {
+      dbQuery("DELETE FROM posts WHERE post_id = '"+ postID +"')");
+    }
+  })
+})
+
+app.get('/my-posts', async function(request, response) {
+  response.set('Access-Control-Allow-Origin', 'https://localhost:3000');
+  try {
+    /*const { session } = require.query.thisSession;
+   const userid = findSession(session)*/
+
+    /*const posts = await pool.query(
       "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE user.user_id = $1",
       [`%${userid}%`]
-    )
+    )*/
 
-    res.json(posts.rows)
+    const posts = await pool.query(
+        "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE users.user_id = 2")
+    response.json(posts.rows)
   } catch (error) {
     console.error(error.message)
   }

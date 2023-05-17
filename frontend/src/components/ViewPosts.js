@@ -24,7 +24,10 @@ function SearchPosts() {
     if(refreshes === 0){
       onLoad();
     }
-    
+
+    const onClick = () => {
+
+    }
 
     return (
       <Fragment>
@@ -52,7 +55,6 @@ function SearchPosts() {
                     <td>{post.post_title}</td>
                     <td>{post.post_body}</td>
                     <td>{post.username}</td>
-                  <button>Edit</button>
                   </tr>
                 ))
               }
