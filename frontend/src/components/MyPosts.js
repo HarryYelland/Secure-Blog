@@ -2,9 +2,9 @@ import React, {Fragment, useState, useEffect} from 'react';
 import './style.css';
 import Axios from "axios";
 
-const deletePost = async () => {
+const deletePost = async (e) => {
     Axios.post("https://localhost:3001/delete-post", {
-        postID: document.getElementById("test").value
+        postID: e
     }).then((response) => {
         console.log(response);
         alert("Post deleted");
@@ -35,9 +35,9 @@ function SearchPosts() {
       onLoad();
     }
 
-    function returnPostID(tableRow){
-        console.log(tableRow);
-        return document.getElementById("test").textContent = tableRow;
+    function returnPostID(pid){
+        console.log(pid);
+        return document.getElementById("test").textContent = pid;
     };
 
     return (
@@ -67,7 +67,7 @@ function SearchPosts() {
                     <td>{post.post_body}</td>
                     <td>{post.username}</td>
                       <button onClick={e => returnPostID(post.post_id)}>Display Post ID</button>
-                      <button onClick={deletePost}>Delete Post</button>
+                      <button onClick={e => deletePost(post.post_id)}>Delete Post</button>
                   </tr>
                 ))
               }
