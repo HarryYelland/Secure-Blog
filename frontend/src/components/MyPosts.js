@@ -1,6 +1,15 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import './style.css';
+import Axios from "axios";
 
+const deletePost = async (e) => {
+    Axios.post("https://localhost:3001/delete-post", {
+        postID: e
+    }).then((response) => {
+        console.log(response);
+        alert("Post deleted");
+    });
+}
 function SearchPosts() {
     const [posts, setPosts] = useState([])
     const [refreshes, setRefreshes] = useState(0)
@@ -12,6 +21,7 @@ function SearchPosts() {
       try {
         const response = await fetch(`http://localhost:3001/my-posts/?session=${session}`);
         const parseResponse = await response.json();
+        const thisUser = await window.sessionStorage.getItem("session")
 
         //console.log(parseResponse);
         setPosts(parseResponse);
@@ -24,7 +34,11 @@ function SearchPosts() {
     if(refreshes === 0){
       onLoad();
     }
-    
+
+    function returnPostID(pid){
+        console.log(pid);
+        return document.getElementById("test").textContent = pid;
+    };
 
     return (
       <Fragment>
@@ -52,12 +66,15 @@ function SearchPosts() {
                     <td>{post.post_title}</td>
                     <td>{post.post_body}</td>
                     <td>{post.username}</td>
+                      <button onClick={e => returnPostID(post.post_id)}>Display Post ID</button>
+                      <button onClick={e => deletePost(post.post_id)}>Delete Post</button>
                   </tr>
                 ))
               }
           </tbody>
         </table>
         </div>
+          <p id="test">POSTS</p>
       </Fragment>
     )   
 }

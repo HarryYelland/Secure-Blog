@@ -1,6 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import './style.css';
 
+function EditPost(){};
 function SearchPosts() {
     const [posts, setPosts] = useState([])
     const [refreshes, setRefreshes] = useState(0)
@@ -23,7 +24,10 @@ function SearchPosts() {
     if(refreshes === 0){
       onLoad();
     }
-    
+
+    const onClick = () => {
+
+    }
 
     return (
       <Fragment>
