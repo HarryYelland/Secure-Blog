@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
-//import { ReCAPTCHA } from "react-google-recaptcha";
+import { ReCAPTCHA } from "react-google-recaptcha";
 
-var bot = true;
+function AddPost() { 
+const [captcha, setCaptcha] = useState(false);
+const key = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
 
 const submit = () => {
   //if(bot == false){
@@ -20,11 +22,11 @@ const submit = () => {
   //}
 };
 
-function verify(){
-  bot = true;
+function onChange(){
+  setCaptcha(true);
 }
 
-function AddPost() {  
+ 
   return (
     <div>
       <h2>Make a new post!</h2>
@@ -39,6 +41,11 @@ function AddPost() {
           <input type="radio" id="private1" name="privacyval" value="private" required></input><br/>
           <label htmlFor="private2">Public post</label>
           <input type="radio" id="private2" name="privacyval" value="notprivate"></input><br/>
+          <ReCAPTCHA
+            sitekey={key}
+            render="explicit"
+            onloadCallback={onChange}
+          />
         <button type="submit" id="postSubmit" onClick={submit}>Submit</button>
     </form>
         <br/>
