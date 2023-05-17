@@ -565,7 +565,6 @@ app.get('/login-user', async function(req, res){
       const password = await pool.query(getPass);
       const salt = await pool.query(getSalt);
       const id = await pool.query(getId);
-
       var correct = false;
       correct = await passwordChecker()
 

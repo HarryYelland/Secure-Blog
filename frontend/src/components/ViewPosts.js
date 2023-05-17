@@ -1,6 +1,7 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import './style.css';
 
+function EditPost(){};
 function SearchPosts() {
     const [posts, setPosts] = useState([])
     const [refreshes, setRefreshes] = useState(0)
@@ -51,6 +52,7 @@ function SearchPosts() {
                     <td>{post.post_title}</td>
                     <td>{post.post_body}</td>
                     <td>{post.username}</td>
+                  <button>Edit</button>
                   </tr>
                 ))
               }
