@@ -29,7 +29,7 @@ function Register() {
 
     return (
       <Fragment>
-        <h2>Login</h2>
+        <h2>Register</h2>
         <h3>{response}</h3>
         <div className='container'>
           <form onSubmit={onSubmitForm}>
