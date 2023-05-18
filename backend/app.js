@@ -557,6 +557,8 @@ app.post('/delete-post', function (request, response){
 
 app.get('/my-posts', async function(request, response) {
   response.set('Access-Control-Allow-Origin', 'https://localhost:3000');
+  var session = request.query.session;
+  var user_id = finduserid(session)
   try {
     /*const { session } = require.query.thisSession;
    const userid = findSession(session)*/
@@ -567,7 +569,7 @@ app.get('/my-posts', async function(request, response) {
     )*/
 
     const posts = await pool.query(
-        "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE users.user_id = 2")
+        "SELECT post_id, post_title, post_body, users.username FROM posts LEFT JOIN users ON posts.author = users.user_id WHERE users.user_id = " +user_id)
     response.json(posts.rows)
   } catch (error) {
     console.error(error.message)
