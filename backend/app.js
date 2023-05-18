@@ -64,7 +64,8 @@ function finduserid(session){
   for(let i=0; i<sessions.length; i++){
     console.log("session" + session)
     console.log("in array" + sessions[i][0])
-    if(sessions[i][0] === session){
+    if(sessions[i][0].toString() === session){
+      console.log(sessions[i])
       return sessions[i][1];
     }
   }
@@ -110,8 +111,6 @@ app.post("/check-session", (req, res) => {
 );
 
 //addSession(generateSessionId(), 1)
-console.log("///");
-console.log(sessions);
 
 const Pool = require('pg').Pool
 const pool = new Pool({
@@ -178,22 +177,27 @@ function addHash(rawPassword){
   return hashPwd;
 }
 
-function passwordGenerator(rawPassword, salt){
+async function passwordGenerator(rawPassword, salt){
   var improvedPassword = "";
-  improvedPassword = addSalt(rawPassword, salt);
-  improvedPassword = addPepper(improvedPassword, generatePepper);
-  improvedPassword = addHash(improvedPassword);
+  improvedPassword = await addSalt(rawPassword, salt);
+  console.log("After Salt: "+ improvedPassword);
+  improvedPassword = await addPepper(improvedPassword, await generatePepper());
+  console.log("After Pepper: "+ improvedPassword);
+  improvedPassword = await addHash(improvedPassword);
+  console.log("After Hash: " +improvedPassword);
   return improvedPassword;
 }
 
-function passwordChecker(rawPassword, salt, correctPass){
+async function passwordChecker(rawPassword, salt, correctPass){
+  console.log("salt " + salt)
   var passwordcheck = "";
   for(let i=0; i<allChars.length; i++){
-    passwordcheck = addSalt(rawPassword, salt);
-    passwordcheck = addPepper(passwordcheck, allChars.charAt(i));
-    passwordcheck = addHash(passwordcheck);
-
-    if(rawPassword === correctPass){
+    passwordcheck = await addSalt(rawPassword, salt);
+    passwordcheck = await addPepper(passwordcheck, allChars.charAt(i));
+    passwordcheck = await addHash(passwordcheck);
+    //console.log(passwordcheck)
+    if(passwordcheck === correctPass){
+      console.log("password correct")
       return true;
     }
   }
@@ -456,6 +460,7 @@ app.get('/add-user', async function(req, res){
 
 app.post("/add-post", (req, res) => {
   res.set('Access-Control-Allow-Origin', 'https://localhost:3000');
+  var userid = finduserid(req.body.session);
   if(antiSQLi(req.body.postTitle) == false ||
     antiSQLi(req.body.postText) == false    
   ){
@@ -479,7 +484,7 @@ app.post("/add-post", (req, res) => {
     privacy = "FALSE"
   };
 
-  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', 2, '"+privacy+"')");
+  dbQuery("INSERT INTO posts (post_title, post_body, author, is_private) VALUES ('" + req.body.postTitle + "', '" + req.body.postText + "', '" + userid + "', '" +privacy+"')");
   console.log("Post added!");
   res.send("Post added!");
   return res;
@@ -590,13 +595,14 @@ app.get('/login-user', async function(req, res){
       const salt = await pool.query(getSalt);
       const id = await pool.query(getId);
       var correct = false;
-      correct = await passwordChecker()
+      correct = await passwordChecker(pass, salt.rows[0].salt, password.rows[0].password)
 
       if(correct === false){
+        //console.log("password " + pass + " does not match "+ password.rows[0].password)
         res.json({"message": "User Details Incorrect. Please try again.", "session": ""});
       } else {
         var session = await generateSessionId();
-        await addSession(session, id);
+        await addSession(session, id.rows[0].user_id);
         res.json({"message": "", "session": session});
       }
     }

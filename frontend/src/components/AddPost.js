@@ -12,6 +12,7 @@ const submit = () => {
     Axios.post("http://localhost:3001/add-post", {
         postTitle: document.getElementById("postTitle").value,
         postText: document.getElementById("postText").value,
+        session: window.sessionStorage.getItem("session"),
         privacy: document.querySelector('input[name="privacyval"]:checked').value
     }).then((response) => {
       console.log(response);
@@ -29,13 +30,17 @@ function onChange(){
  
   return (
     <div>
+        <a href="/post">Make a post</a>
+        <a href="/view-all">View all posts</a>
+        <a href="/search">Search Posts</a>
+        <a href="/my-posts">My Posts</a>
       <h2>Make a new post!</h2>
       <form>
         <label for="postTitle">Make a title!</label><br/>
         <input type="text" id="postTitle"/><br/>
         <br/>
-        <label for="postText" placeholder="Type anything here! (within reason lol)">Post something here!</label><br/>
-        <textarea id="postText" placeholder="Type anything here! (within reason lol)" cols="40" rows="10"></textarea>
+        <label for="postText" placeholder="Type anything here!">Post something here!</label><br/>
+        <textarea id="postText" placeholder="Type anything here!" cols="40" rows="10"></textarea>
         <br/>
           <label for="private1">Private post</label>
           <input type="radio" id="private1" name="privacyval" value="private" required></input><br/>
