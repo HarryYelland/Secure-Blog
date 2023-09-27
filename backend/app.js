@@ -657,6 +657,7 @@ app.get('/check-2fa', async function(req, res){
 })
 
 app.listen(PORT, () => {
+  testHarness();
   console.log("Running Backend server on port ", PORT);
 });
 
@@ -700,7 +701,7 @@ function testHarness(){
   testAntiSQLi("embeddedinsertstatement");
 }
 
-//testHarness();
+
 
 
 function Enumeration(){ //Call this on failed login and include "error-message in HTML
